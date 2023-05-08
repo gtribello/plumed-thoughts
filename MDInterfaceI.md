@@ -22,7 +22,7 @@ p.cmd("setNatoms",num_atoms)
 p.cmd("setLogFile","test.log")
 p.cmd("init")
 # Tell PLUMED to calculate the distance between two atoms
-p.cmd("readInputLine", "d1: DISTANCE ATOMS=1,2)
+p.cmd("readInputLine", "d1: DISTANCE ATOMS=1,2")
 # Get the rank of the PLMD::Value that holds the distance
 # This command sets up the GET object
 rank = np.zeros( 1, dtype=np.int_ )
