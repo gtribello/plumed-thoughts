@@ -23,9 +23,15 @@ flowchart TB;
   A[Passing data] -.-> B[Reproducibility];
   B -.-> C[Hierachy];
   C -.-> D[Passing data to and from PLUMED I];
+  D --> E[Passing data to and from PLUMED II];
   A --> D;
+  E --> F[Passing the energy];
+  A --> G[Virtual atoms]
   click A "Passing.md" "8th May 2023: General thoughts about how data is passed between PLUMED actions";
   click B "Reproducibility.md" "8th May 2023: General thoughts about why we want to do calculations that are reproducibile";
   click C "Community.md" "8th May 2023: General thoughts about how we support communities of scholars"
   click D "MDInterfaceI.md" "8th May 2023: A description of how data is passed to and from PLUMED"
+  click E "MDInterfaceII.md" "21st May 2023: A description of how atomic properties are passed to and from PLUMED"
+  click F "PassingEnergy.md" "21st May 2023: A description of how potential energy is passed to PLUMED"
+  click G "VirtualAtoms.md" "22nd May 2023: A description of how virtual atom positions are passed between Actions in PLUMED"
 ```
