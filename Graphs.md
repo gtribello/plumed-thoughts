@@ -22,7 +22,7 @@ And run the command:
 
 ````
 plumed show_graph --plumed plumed.dat --out graph.md
-```
+````
 
 I can generate the graph shown below:
 
@@ -36,43 +36,37 @@ Box -- Box --> c1
 linkStyle 0 stroke:red,color:red;
 MD --> c1
 linkStyle 1 stroke:violet,color:violet;
-c1(["`label=c1
- COM
-`"])
+c1(["label=c1
+ COM"])
 Box -- Box --> c2
 linkStyle 2 stroke:red,color:red;
 MD --> c2
 linkStyle 3 stroke:violet,color:violet;
-c2(["`label=c2
- COM
-`"])
+c2(["label=c2
+ COM"])
 Box -- Box --> d1
 linkStyle 4 stroke:red,color:red;
 c1 -- c1 --> d1
 linkStyle 5 stroke:violet,color:violet;
 c2 -- c2 --> d1
 linkStyle 6 stroke:violet,color:violet;
-d1(["`label=d1
- DISTANCE
-`"])
+d1(["label=d1
+ DISTANCE"])
 d1 -- d1.z --> r
-r(["`label=r
- RESTRAINT
-`"])
+r(["label=r
+ RESTRAINT"])
 d1 -- d1.x --> f1
 d1 -- d1.y --> f1
-f1(["`label=f1
+f1(["label=f1
  CUSTOM
-FUNC=x\*x+y\*y
-`"])
+FUNC=x\*x+y\*y"])
 d1 -- d1.x --> 7
 d1 -- d1.y --> 7
 f1 -- f1 --> 7
 r -- r.bias --> 7
-7("`label=#64;7
+7("label=#64;7
  PRINT
-FILE=colvar
-`")
+FILE=colvar")
 ```
 
 The file `graph.md` output by the command above is renderable using [mermaid](https://mermaid.js.org/syntax/flowchart.html). You can see the resulting flow chart if you copy and paste the file's contents 
@@ -106,22 +100,17 @@ When I run the command above on the plumed input above, I obtain the following f
 
 ```mermaid
 flowchart BT
-r(["`label=r 
- RESTRAINT 
-`"])
+r(["label=r 
+ RESTRAINT"])
 r -- d1.z --> d1
-d1(["`label=d1
- DISTANCE
-`"])
-c2(["`label=c2
- COM
-`"])
-c1(["`label=c1
- COM
-`"])
-Box{{"`label=Box
- PBC
-`"}}
+d1(["label=d1
+ DISTANCE"])
+c2(["label=c2
+ COM"])
+c1(["label=c1
+ COM"])
+Box{{"label=Box
+ PBC"}}
 c1 -- Box --> Box
 linkStyle 1 stroke:red,color:red;
 c1 --> MD

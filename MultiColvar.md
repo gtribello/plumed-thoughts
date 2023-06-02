@@ -40,32 +40,26 @@ If you look at the flowchart representation for this input, you can understand h
 ```mermaid
 flowchart TB
 MD{{positions from MD}}
-Box{{"`label=Box 
- PBC
-`"}}
+Box{{"label=Box 
+ PBC"}}
 Box -- Box --> d1
 linkStyle 0 stroke:red,color:red;
 MD --> d1
 linkStyle 1 stroke:violet,color:violet;
 subgraph subd1 [d1]
-d1(["`label=d1
- DISTANCE
-`"])
-d1l(["`label=d1l
- LESS_THAN
-`"])
-d1s(["`label=d1s
- SUM
-`"])
+d1(["label=d1
+ DISTANCE"])
+d1l(["label=d1l
+ LESS_THAN"])
+d1s(["label=d1s
+ SUM"])
 end
 d1 -- d1 --> d1l
 linkStyle 2 stroke:blue,color:blue;
 d1l -- d1l --> d1s
 linkStyle 3 stroke:blue,color:blue;
 d1s -- d1s --> r
-r(["`label=r
- RESTRAINT
-`"])
+r(["label=r RESTRAINT"])
 ```
 
 The first action above calculates the five distances and passes a vector with five elements to the LESS_THAN action that follows it. This LESS_THAN action
@@ -85,29 +79,24 @@ As you can see from the flowchart representation for the force passing in the in
 
 ```mermaid
 flowchart BT
-r(["`label=r 
- RESTRAINT 
-`"])
+r(["label=r 
+ RESTRAINT"])
 r -- d1s --> d1s
 subgraph subd1 [d1]
-d1(["`label=d1
- DISTANCE
-`"])
-d1l(["`label=d1l
- LESS_THAN
-`"])
+d1(["label=d1
+ DISTANCE"])
+d1l(["label=d1l
+ LESS_THAN"])
 d1 -. d1 .-> d1l
 linkStyle 1 stroke:blue,color:blue;
-d1s(["`label=d1s
- SUM
-`"])
+d1s(["label=d1s
+ SUM"])
 d1l -. d1l .-> d1s
 linkStyle 2 stroke:blue,color:blue;
 end
 d1s == d1s ==> d1
-Box{{"`label=Box
- PBC
-`"}}
+Box{{"label=Box
+ PBC"}}
 d1 -- Box --> Box
 linkStyle 4 stroke:red,color:red;
 d1 --> MD
