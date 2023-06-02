@@ -35,7 +35,7 @@ In other words, pointers to values and forces in the MD code are passed to PUT a
 The PLMD::Value objects created by a DOMAIN_DECOMPOSITION action are always vectors with the same number of components as atoms in the system. Furthermore, you can create multiple PUT
 actions from a single DOMAIN_DECOMPOSITION action. To see why this is useful, consider the following DOMAIN_DECOMPOSITION command:
 
-````
+```plumed
 gromacs: DOMAIN_DECOMPOSITION ...
    NATOMS=2000
    VALUE1=posx UNIT1=length PERIODIC1=NO CONSTANT1=False ROLE1=x
@@ -44,7 +44,7 @@ gromacs: DOMAIN_DECOMPOSITION ...
    VALUE4=Masses UNIT4=mass PERIODIC4=NO CONSTANT4=True ROLE4=m
    VALUE5=Charges UNIT5=charge PERIODIC5=NO CONSTANT5=True ROLE5=q
 ...
-````
+```
 
 This action is created when you call `plumed.cmd("setNatoms",&natoms)` from gromacs. It makes 5 PLMD::Value called posx, posy, posz, Masses and Charges. 
 These PLMD::Value objects then hold the x, y and z positions of the atoms and the masses and charges of the atoms. It is important to note that this command will 

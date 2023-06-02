@@ -27,6 +27,9 @@ flowchart TB;
   A --> D;
   E --> F[Passing the energy];
   A --> G[Virtual atoms]
+  B --> H[Graphs]
+  A --> I[multi colvar]
+  H --> I[chained derivatives]
   click A "Passing.md" "8th May 2023: General thoughts about how data is passed between PLUMED actions";
   click B "Reproducibility.md" "8th May 2023: General thoughts about why we want to do calculations that are reproducibile";
   click C "Community.md" "8th May 2023: General thoughts about how we support communities of scholars"
@@ -34,4 +37,6 @@ flowchart TB;
   click E "MDInterfaceII.md" "21st May 2023: A description of how atomic properties are passed to and from PLUMED"
   click F "PassingEnergy.md" "21st May 2023: A description of how potential energy is passed to PLUMED"
   click G "VirtualAtoms.md" "22nd May 2023: A description of how virtual atom positions are passed between Actions in PLUMED"
+  click H "Graphs.md" "1st June 2023: A description of the way we can use graphs to illustrate PLUMED input files"
+  click I "MultiColvar.md" "1st June 2023: A description that explains how multicolvar is implemented"
 ```
