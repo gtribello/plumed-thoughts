@@ -39,9 +39,9 @@ If you look at the flowchart representation for this input, you can understand h
 
 ```mermaid
 flowchart TB
-MD{{"positions from MD"}}
-Box{{"label=Box 
- PBC"}}
+MD("positions from MD")
+Box("label=Box 
+ PBC")
 Box -- Box --> d1
 linkStyle 0 stroke:red,color:red;
 MD --> d1
@@ -96,13 +96,13 @@ d1l -. d1l .-> d1s
 linkStyle 2 stroke:blue,color:blue;
 end
 d1s == d1s ==> d1
-Box{{"label=Box
- PBC"}}
+Box("label=Box
+ PBC")
 d1 -- Box --> Box
 linkStyle 4 stroke:red,color:red;
 d1 --> MD
 linkStyle 5 stroke:violet,color:violet;
-MD{{"positions from MD"}}
+MD("positions from MD")
 ```
 
 You can see that forces on the atoms due to the restraint on the sum, d1s, are passed directly to d1. This direct calculation of the forces is possible because derivatives 

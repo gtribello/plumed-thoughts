@@ -28,9 +28,9 @@ I can generate the graph shown below:
 
 ```mermaid
 flowchart TB
-MD{{"positions from MD"}}
-Box{{"label=Box 
- PBC"}}
+MD("positions from MD")
+Box("label=Box 
+ PBC")
 Box -- Box --> c1
 linkStyle 0 stroke:red,color:red;
 MD --> c1
@@ -77,7 +77,7 @@ objects are passed between the actions.
 
 The shape of the node tells you about the type of action:
 
-* Irregular-hexagonal nodes are PUT actions containing data passed from the MD code. These nodes cannot take PLMD::Value objects created in PLUMED as input.
+* Rectangular nodes with only outwards arrows are PUT actions containing data passed from the MD code. These nodes cannot take PLMD::Value objects created in PLUMED as input.
 * Rectangular nodes are actions like PRINT that only take PLMD::Value as arguments. These nodes cannot create PLMD::Value objects and pass them to other actions.
 * Rounded nodes are actions that can take PLMD::Value objects created within PLUMED as input and pass on such objects as output.
 
@@ -108,8 +108,8 @@ c2(["label=c2
  COM"])
 c1(["label=c1
  COM"])
-Box{{"label=Box
- PBC"}}
+Box("label=Box
+ PBC")
 c1 -- Box --> Box
 linkStyle 1 stroke:red,color:red;
 c1 --> MD
@@ -124,7 +124,7 @@ d1 -- c1 --> c1
 linkStyle 6 stroke:violet,color:violet;
 d1 -- c2 --> c2
 linkStyle 7 stroke:violet,color:violet;
-MD{{"positions from MD"}}
+MD("positions from MD")
 ```
 
 Notice that fewer actions are shown in this new graph. This is because the graph above only shows actions that play some role in the force calculation.
