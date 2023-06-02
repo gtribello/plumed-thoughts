@@ -39,7 +39,7 @@ If you look at the flowchart representation for this input, you can understand h
 
 ```mermaid
 flowchart TB
-MD{{positions from MD}}
+MD{{"positions from MD"}}
 Box{{"label=Box 
  PBC"}}
 Box -- Box --> d1
@@ -59,7 +59,8 @@ linkStyle 2 stroke:blue,color:blue;
 d1l -- d1l --> d1s
 linkStyle 3 stroke:blue,color:blue;
 d1s -- d1s --> r
-r(["label=r RESTRAINT"])
+r(["label=r
+ RESTRAINT"])
 ```
 
 The first action above calculates the five distances and passes a vector with five elements to the LESS_THAN action that follows it. This LESS_THAN action
@@ -101,7 +102,7 @@ d1 -- Box --> Box
 linkStyle 4 stroke:red,color:red;
 d1 --> MD
 linkStyle 5 stroke:violet,color:violet;
-MD{{positions from MD}}
+MD{{"positions from MD"}}
 ```
 
 You can see that forces on the atoms due to the restraint on the sum, d1s, are passed directly to d1. This direct calculation of the forces is possible because derivatives 

@@ -28,10 +28,9 @@ I can generate the graph shown below:
 
 ```mermaid
 flowchart TB
-MD{{positions from MD}}
-Box{{"`label=Box 
- PBC
-`"}}
+MD{{"positions from MD"}}
+Box{{"label=Box 
+ PBC"}}
 Box -- Box --> c1
 linkStyle 0 stroke:red,color:red;
 MD --> c1
@@ -59,7 +58,7 @@ d1 -- d1.x --> f1
 d1 -- d1.y --> f1
 f1(["label=f1
  CUSTOM
-FUNC=x\*x+y\*y"])
+FUNC=x*x+y*y"])
 d1 -- d1.x --> 7
 d1 -- d1.y --> 7
 f1 -- f1 --> 7
@@ -94,7 +93,7 @@ You can also show how forces are passed between actions by using the command:
 
 ````
 plumed show_graph --plumed plumed.dat --out graph.md --force
-```
+````
 
 When I run the command above on the plumed input above, I obtain the following flowchart:
 
@@ -125,7 +124,7 @@ d1 -- c1 --> c1
 linkStyle 6 stroke:violet,color:violet;
 d1 -- c2 --> c2
 linkStyle 7 stroke:violet,color:violet;
-MD{{positions from MD}}
+MD{{"positions from MD"}}
 ```
 
 Notice that fewer actions are shown in this new graph. This is because the graph above only shows actions that play some role in the force calculation.
