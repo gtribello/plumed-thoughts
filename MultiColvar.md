@@ -1,4 +1,4 @@
-# Reimplementing MultiColvar
+# Reimplementing MultiColvar
 
 The original idea for the MultiColvar class came from a conversation I had with Fabio Pietrucci.
 The line of thought went something like this:
@@ -18,7 +18,7 @@ a command like:
 
 ```plumed
 d1: DISTANCES ATOMS=1,2 ATOMS2=3,4 ATOMS3=5,6 ATOMS4=7,8 ATOMS=9,10 LESS_THAN={RATIONAL R_0=0.1}
-PRINT ARG=d1.less_than FILE=colvar
+PRINT ARG=d1.lessthan FILE=colvar
 ```
 to calculate and print the number of the five distances above that are less than 0.1 nm.
 
