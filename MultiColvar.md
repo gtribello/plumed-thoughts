@@ -17,7 +17,7 @@ The MultiColvarBase class I implemented after this conversation was designed wit
 a command like:
 
 ```plumed
-d1: DISTANCES ATOMS=1,2 ATOMS2=3,4 ATOMS3=5,6 ATOMS4=7,8 ATOMS=9,10 LESS_THAN={RATIONAL R_0=0.1}
+d1: DISTANCES ATOMS1=1,2 ATOMS2=3,4 ATOMS3=5,6 ATOMS4=7,8 ATOMS5=9,10 LESS_THAN={RATIONAL R_0=0.1}
 PRINT ARG=d1.lessthan FILE=colvar
 ```
 to calculate and print the number of the five distances above that are less than 0.1 nm.

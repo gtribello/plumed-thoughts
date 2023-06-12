@@ -4,7 +4,7 @@ As discussed in [this article](MultiColvar.md), I have made substantial changes 
 input to calculate the number of distances are less than 0.1 nm is as follows:
 
 ```plumed
-d1: DISTANCES ATOMS=1,2 ATOMS2=3,4 ATOMS3=5,6 ATOMS4=7,8 ATOMS=9,10 LESS_THAN={RATIONAL R_0=0.1}
+d1: DISTANCES ATOMS1=1,2 ATOMS2=3,4 ATOMS3=5,6 ATOMS4=7,8 ATOMS5=9,10 LESS_THAN={RATIONAL R_0=0.1}
 PRINT ARG=d1.lessthan FILE=colvar
 ```
 
@@ -53,7 +53,7 @@ understood by considering the following (old-style) PLUMED input again:
 
 ```plumed
 # This is a shortcut
-d1: DISTANCES ATOMS=1,2 ATOMS2=3,4 ATOMS3=5,6 ATOMS4=7,8 ATOMS=9,10 LESS_THAN={RATIONAL R_0=0.1}
+d1: DISTANCES ATOMS1=1,2 ATOMS2=3,4 ATOMS3=5,6 ATOMS4=7,8 ATOMS5=9,10 LESS_THAN={RATIONAL R_0=0.1}
 # This is not a shortcut
 PRINT ARG=d1.lessthan FILE=colvar
 ```
@@ -93,7 +93,7 @@ When `ActionWithArguments` tries to interpret a Value name such as `d1.lessthan`
 Notice that this behaviour is also triggered if you use wildcards like this:
 
 ```plumed
-d1: DISTANCES ATOMS=1,2 ATOMS2=3,4 ATOMS3=5,6 ATOMS4=7,8 ATOMS=9,10 LOWEST LESS_THAN={RATIONAL R_0=0.1}
+d1: DISTANCES ATOMS1=1,2 ATOMS2=3,4 ATOMS3=5,6 ATOMS4=7,8 ATOMS5=9,10 LOWEST LESS_THAN={RATIONAL R_0=0.1}
 PRINT ARG=d1.* FILE=colvar
 ```
 
