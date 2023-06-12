@@ -45,5 +45,5 @@ flowchart TB;
   click H "Graphs.md" "1st June 2023: A description of the way we can use graphs to illustrate PLUMED input files"
   click I "MultiColvar.md" "1st June 2023: An explaination of how multicolvar is implemented"
   click J "MultiColvarShortcut.md" "9th June 2023: An explanation of how backwards compatibility for MultiColvar has been ensured and an introduction to ActionShortcut"
-  click K "contactMatix.md" "12th June 2023: An explanation of how coordination numbers and contact maps can be used to construct CVs"
+  click K "contactMatrix.md" "12th June 2023: An explanation of how coordination numbers and contact maps can be used to construct CVs"
 ```
