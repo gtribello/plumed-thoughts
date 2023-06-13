@@ -56,12 +56,15 @@ linkStyle 0 stroke:red,color:red;
 MD --> c1
 linkStyle 1 stroke:violet,color:violet;
 subgraph subc1 [c1]
+subgraph subc1_mat [c1]
 c1(["label=c1
  CONTACT_MATRIX
 "])
 cc(["label=cc
  MATRIX_VECTOR_PRODUCT
 "])
+end
+style subc1_mat fill:lightblue
 mtc(["label=mtc
  MORE_THAN
 "])
@@ -93,17 +96,20 @@ atoms input to c1 are accumulated during the forward loop.  Consequently, when t
 
 ```mermaid
 flowchart BT
-8(["label=#64;8 
- BIASVALUE 
+8(["label=#64;8
+ BIASVALUE
 "])
 8 -- s --> s
 subgraph subc1 [c1]
+subgraph subc1_mat [c1]
 c1(["label=c1
  CONTACT_MATRIX
 "])
 cc(["label=cc
  MATRIX_VECTOR_PRODUCT
 "])
+end
+style subc1_mat fill:lightblue
 c1 -. c1.w .-> cc
 linkStyle 1 stroke:red,color:red;
 mtc(["label=mtc
@@ -148,7 +154,8 @@ We can also use the sparsity of the contact matrix to make the time required to 
 $i,j$ of the contact matrix is only non-zero if two atoms are within a cutoff, $r_c$.  We can determine that many pairs of atoms are further appart than $r_c$ without computing the 
 distance between these atoms by using divide and conquer strategies such as linked lists and neighbour lists.  These optimisation tricks are implemented in the base class AgencyMatrixBase.  
 This class therefore ensures that only the subset of elements of the contact matrix that are definitely non-zero are computed.  Furthermore, because coordination numbers are computed 
-within the chain of actions only the non-zero elements of the matrix are propegated onwards through the chain when we multiply by the vector of ones.
+within the chain of actions only the non-zero elements of the matrix are propegated onwards through the chain when we multiply by the vector of ones.  In the flowchart diagrams that I have 
+shown previously the blue subgraphs illustrate how data is passed through actions as the elements of the matrix row are evaluated.
 
 ## A complicated CV
 
@@ -223,30 +230,39 @@ linkStyle 0 stroke:red,color:red;
 MD --> cm_cncn
 linkStyle 1 stroke:violet,color:violet;
 subgraph subcm_cncn [cm_cncn]
+subgraph subcm_cncn_mat [cm_cncn]
 cm_cncn(["label=cm_cncn 
  CONTACT_MATRIX 
 "])
 cc_cncn(["label=cc_cncn 
  MATRIX_VECTOR_PRODUCT 
 "])
+end
+style subcm_cncn_mat fill:lightblue
 mt_cncn(["label=mt_cncn 
  MORE_THAN 
 "])
+subgraph subcm_cnpb_mat [cm_cnpb]
 cm_cnpb(["label=cm_cnpb 
  CONTACT_MATRIX 
 "])
 cc_cnpb(["label=cc_cnpb 
  MATRIX_VECTOR_PRODUCT 
 "])
+end
+style subcm_cnpb_mat fill:lightblue
 mt_cnpb(["label=mt_cnpb 
  MORE_THAN 
 "])
+subgraph subcm_cnI_mat [cm_cnI]
 cm_cnI(["label=cm_cnI 
  CONTACT_MATRIX 
 "])
 cc_cnI(["label=cc_cnI 
  MATRIX_VECTOR_PRODUCT 
 "])
+end
+style subcm_cnI_mat fill:lightblue
 mt_cnI(["label=mt_cnI 
  MORE_THAN 
 "])
@@ -311,12 +327,15 @@ rr(["label=rr
 "])
 rr -- ff --> ff
 subgraph subcm_cncn [cm_cncn]
+subgraph subcm_cncn_mat [cm_cncn]
 cm_cncn(["label=cm_cncn 
  CONTACT_MATRIX 
 "])
 cc_cncn(["label=cc_cncn 
  MATRIX_VECTOR_PRODUCT 
 "])
+end
+style subcm_cncn_mat fill:lightblue
 cm_cncn -. cm_cncn.w .-> cc_cncn
 linkStyle 1 stroke:red,color:red;
 mt_cncn(["label=mt_cncn 
@@ -324,12 +343,15 @@ mt_cncn(["label=mt_cncn
 "])
 cc_cncn -. cc_cncn .-> mt_cncn
 linkStyle 2 stroke:blue,color:blue;
+subgraph subcm_cnpb_mat [cm_cnpb]
 cm_cnpb(["label=cm_cnpb 
  CONTACT_MATRIX 
 "])
 cc_cnpb(["label=cc_cnpb 
  MATRIX_VECTOR_PRODUCT 
 "])
+end
+style subcm_cnpb_mat fill:lightblue
 cm_cnpb -. cm_cnpb.w .-> cc_cnpb
 linkStyle 3 stroke:red,color:red;
 mt_cnpb(["label=mt_cnpb 
@@ -337,12 +359,15 @@ mt_cnpb(["label=mt_cnpb
 "])
 cc_cnpb -. cc_cnpb .-> mt_cnpb
 linkStyle 4 stroke:blue,color:blue;
+subgraph subcm_cnI_mat [cm_cnI]
 cm_cnI(["label=cm_cnI 
  CONTACT_MATRIX 
 "])
 cc_cnI(["label=cc_cnI 
  MATRIX_VECTOR_PRODUCT 
 "])
+end
+style subcm_cnI_mat fill:lightblue
 cm_cnI -. cm_cnI.w .-> cc_cnI
 linkStyle 5 stroke:red,color:red;
 mt_cnI(["label=mt_cnI 

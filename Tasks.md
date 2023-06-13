@@ -148,38 +148,44 @@ where $r_{ij}$ is the distance between atoms $i$ and $j$ and $\sigma_l$ is the s
 You can see the graph that shows how data passes through the code below:
 
 ```mermaid
-flowchart TB
+flowchart TB 
 MD(positions from MD)
 Box("label=Box 
- PBC
+ PBC 
 ")
-ones(["label=ones
- CONSTANT
+ones(["label=ones 
+ CONSTANT 
 "])
 Box -- Box --> c1
 linkStyle 0 stroke:red,color:red;
 MD --> c1
 linkStyle 1 stroke:violet,color:violet;
 subgraph subc1 [c1]
-c1(["label=c1
- CONTACT_MATRIX
+subgraph subc1_mat [c1]
+c1(["label=c1 
+ CONTACT_MATRIX 
 "])
-cc1(["label=cc1
- MATRIX_VECTOR_PRODUCT
+cc1(["label=cc1 
+ MATRIX_VECTOR_PRODUCT 
 "])
-mt1(["label=mt1
- MORE_THAN
+end
+style subc1_mat fill:lightblue
+mt1(["label=mt1 
+ MORE_THAN 
 "])
-c2(["label=c2
- CONTACT_MATRIX
+subgraph subc2_mat [c2]
+c2(["label=c2 
+ CONTACT_MATRIX 
 "])
-cc2(["label=cc2
- MATRIX_VECTOR_PRODUCT
+cc2(["label=cc2 
+ MATRIX_VECTOR_PRODUCT 
 "])
-mt2(["label=mt2
- MORE_THAN
+end
+style subc2_mat fill:lightblue
+mt2(["label=mt2 
+ MORE_THAN 
 "])
-prod(["label=prod
+prod(["label=prod 
  CUSTOM
 FUNC=x*y 
 "])
@@ -243,7 +249,8 @@ The loop here runs over the columns of the matrix, although the method `setupFor
 Notice that when we call `runTask` within this loop this calls every method that requires the matrix elements.  In our example above, there will be a call to the runTask method in cc1 after 
 each element of the c1 matrix is computed so that we can calculate the matrix vector product.
 
-Notice, also, however, that PLUMED is clever enough to know that cc2 should not be called when we run over the elements of the c1 matrix.
+Notice, also, however, that PLUMED is clever enough to know that cc2 should not be called when we run over the elements of the c1 matrix.  The blue subgragraphs indicate the actions that PLUMED
+will run over when it works through the various elements in each column of the matrix.
 
 ## Conclusion
 
