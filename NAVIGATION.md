@@ -48,5 +48,5 @@ flowchart TB;
   click I "MultiColvar.md" "1st June 2023: An explaination of how multicolvar is implemented"
   click J "MultiColvarShortcut.md" "9th June 2023: An explanation of how backwards compatibility for MultiColvar has been ensured and an introduction to ActionShortcut"
   click K "contactMatrix.md" "12th June 2023: An explanation of how coordination numbers and contact maps can be used to construct CVs"
-  click L "tasks.md" "13th June 2023: More details on how the task list are used in the calculation of MultiColvars and contact matrix based CVs"
+  click L "Tasks.md" "13th June 2023: More details on how the task list are used in the calculation of MultiColvars and contact matrix based CVs"
 ```
