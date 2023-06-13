@@ -35,6 +35,8 @@ flowchart TB;
   C --> J
   J --> K[contact matrices]
   I --> K
+  K --> L[the task list]
+  I --> L
   click A "Passing.md" "8th May 2023: General thoughts about how data is passed between PLUMED actions";
   click B "Reproducibility.md" "8th May 2023: General thoughts about why we want to do calculations that are reproducibile";
   click C "Community.md" "8th May 2023: General thoughts about how we support communities of scholars"
@@ -46,4 +48,5 @@ flowchart TB;
   click I "MultiColvar.md" "1st June 2023: An explaination of how multicolvar is implemented"
   click J "MultiColvarShortcut.md" "9th June 2023: An explanation of how backwards compatibility for MultiColvar has been ensured and an introduction to ActionShortcut"
   click K "contactMatrix.md" "12th June 2023: An explanation of how coordination numbers and contact maps can be used to construct CVs"
+  click L "tasks.md" "13th June 2023: More details on how the task list are used in the calculation of MultiColvars and contact matrix based CVs"
 ```
