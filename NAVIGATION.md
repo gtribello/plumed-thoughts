@@ -33,7 +33,7 @@ flowchart TB;
   I --> J[multi colvar shortcuts]
   B --> J
   C --> J
-  J --> K
+  J --> K[contact matrices]
   I --> K
   click A "Passing.md" "8th May 2023: General thoughts about how data is passed between PLUMED actions";
   click B "Reproducibility.md" "8th May 2023: General thoughts about why we want to do calculations that are reproducibile";

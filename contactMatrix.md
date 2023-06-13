@@ -1,7 +1,7 @@
 # Contact matices and coordination numbers
 
 The $i$, $j$ element of the conntact matrix, $\mathbf{C}_{ij}$, is one if atoms $i$ and $j$ are within a certain distance $r_c$ of each other and zero otherwise.
-Consequently, if $\mahtbf{C}$ is multiplied from the back by a vector of ones the $i$th element of the resulting matrix tells you the number of atoms that are 
+Consequently, if $\mathbf{C}$ is multiplied from the back by a vector of ones the $i$th element of the resulting matrix tells you the number of atoms that are 
 within $r_c$ of atom $i$.  In other words, the coordination numbers of the atoms can be calculated from the contact matrix by doing matrix vector multiplication.
 
 This realisation about the relationship between the contact map and the coordination number is heavily used in the new version of PLUMED.  For example, to calculate 
@@ -47,60 +47,43 @@ for example, the diagram showing how data passes through the PLUMED actions as t
 
 ```mermaid
 flowchart TB
-MD{{positions from MD}}
-Box{{"`label=Box 
+MD(positions from MD)
+Box("label=Box 
  PBC
-`"}}
+")
 Box -- Box --> c1
 linkStyle 0 stroke:red,color:red;
 MD --> c1
 linkStyle 1 stroke:violet,color:violet;
 subgraph subc1 [c1]
-c1(["`label=c1
+c1(["label=c1
  CONTACT_MATRIX
-`"])
-cc(["`label=cc
+"])
+cc(["label=cc
  MATRIX_VECTOR_PRODUCT
-`"])
-mtc(["`label=mtc
+"])
+mtc(["label=mtc
  MORE_THAN
-`"])
-s(["`label=s
+"])
+s(["label=s
  SUM
-`"])
+"])
 end
-c1 -- c1.w --> 1
-linkStyle 2 stroke:red,color:red;
-1("`label=#64;1
- PRINT
-FILE=colvar
-`")
-ones(["`label=ones
+ones(["label=ones
  CONSTANT
-`"])
+"])
 c1 -- c1.w --> cc
-linkStyle 3 stroke:red,color:red;
+linkStyle 2 stroke:red,color:red;
 ones -- ones --> cc
-linkStyle 4 stroke:blue,color:blue;
-cc -- cc --> 5
-linkStyle 5 stroke:blue,color:blue;
-5("`label=#64;5
- PRINT
-FILE=coords
-`")
+linkStyle 3 stroke:blue,color:blue;
 cc -- cc --> mtc
-linkStyle 6 stroke:blue,color:blue;
+linkStyle 4 stroke:blue,color:blue;
 mtc -- mtc --> s
-linkStyle 7 stroke:blue,color:blue;
-s -- s --> 10
-10("`label=#64;10
- PRINT
-FILE=fcolvar
-`")
-s -- s --> 11
-11(["`label=#64;11
+linkStyle 5 stroke:blue,color:blue;
+s -- s --> 8
+8(["label=#64;8
  BIASVALUE
-`"])
+"])
 ```
 
 Notice that the CONTACT_MATRIX, MATRIX_VECTOR_PRODUCT, MORE_THAN and SUM actions are all in the same subgraph.  The grouping of these actions indicates that the 
@@ -110,27 +93,27 @@ atoms input to c1 are accumulated during the forward loop.  Consequently, when t
 
 ```mermaid
 flowchart BT
-11(["`label=#64;11 
+8(["label=#64;8 
  BIASVALUE 
-`"])
-11 -- s --> s
+"])
+8 -- s --> s
 subgraph subc1 [c1]
-c1(["`label=c1
+c1(["label=c1
  CONTACT_MATRIX
-`"])
-cc(["`label=cc
+"])
+cc(["label=cc
  MATRIX_VECTOR_PRODUCT
-`"])
+"])
 c1 -. c1.w .-> cc
 linkStyle 1 stroke:red,color:red;
-mtc(["`label=mtc
+mtc(["label=mtc
  MORE_THAN
-`"])
+"])
 cc -. cc .-> mtc
 linkStyle 2 stroke:blue,color:blue;
-s(["`label=s
+s(["label=s
  SUM
-`"])
+"])
 mtc -. mtc .-> s
 linkStyle 3 stroke:blue,color:blue;
 end
@@ -140,22 +123,32 @@ subgraph subc1 [c1]
 end
 cc -- ones --> ones
 linkStyle 6 stroke:blue,color:blue;
-ones(["`label=ones
+ones(["label=ones
  CONSTANT
-`"])
-Box{{"`label=Box
+"])
+Box("label=Box
  PBC
-`"}}
+")
 c1 -- Box --> Box
 linkStyle 7 stroke:red,color:red;
 c1 --> MD
 linkStyle 8 stroke:violet,color:violet;
-MD{{positions from MD}}
+MD(positions from MD)
 ```
 
 In short, we do not need to calculate the matrix elements of c1 twice in order to apply the forces as we accumulate the derivatives of the final scalar s during the forward loop.
 
 ## Optimisation details
+
+The contact matrix is sparse.  Each atom is only be connected to a small number of neighbours and the vast majority of the elements of the contact matrix are thus zero.  To reduce 
+the amount of memory that PLUMED requires I have thus implemented sparse matrix storage.  If you do calculate and store a contact matrix only the elements of the matrix that are 
+non-zero are stored.
+
+We can also use the sparsity of the contact matrix to make the time required to compute a contact matrix scale linearly rather than quadratically with the number of atoms.  Element 
+$i,j$ of the contact matrix is only non-zero if two atoms are within a cutoff, $r_c$.  We can determine that many pairs of atoms are further appart than $r_c$ without computing the 
+distance between these atoms by using divide and conquer strategies such as linked lists and neighbour lists.  These optimisation tricks are implemented in the base class AgencyMatrixBase.  
+This class therefore ensures that only the subset of elements of the contact matrix that are definitely non-zero are computed.  Furthermore, because coordination numbers are computed 
+within the chain of actions only the non-zero elements of the matrix are propegated onwards through the chain when we multiply by the vector of ones.
 
 ## A complicated CV
 
@@ -209,61 +202,61 @@ When the forward loop through the actions in the above input file is performed d
 
 ```mermaid
 flowchart TB 
-MD{{positions from MD}}
-Box{{"`label=Box 
+MD(positions from MD)
+Box("label=Box 
  PBC 
-`"}}
-Pb("`label=Pb 
+")
+Pb("label=Pb 
  GROUP 
-`")
-I("`label=I 
+")
+I("label=I 
  GROUP 
-`")
-cn("`label=cn 
+")
+cn("label=cn 
  GROUP 
-`")
-ones64(["`label=ones64 
+")
+ones64(["label=ones64 
  CONSTANT 
-`"])
+"])
 Box -- Box --> cm_cncn
 linkStyle 0 stroke:red,color:red;
 MD --> cm_cncn
 linkStyle 1 stroke:violet,color:violet;
 subgraph subcm_cncn [cm_cncn]
-cm_cncn(["`label=cm_cncn 
+cm_cncn(["label=cm_cncn 
  CONTACT_MATRIX 
-`"])
-cc_cncn(["`label=cc_cncn 
+"])
+cc_cncn(["label=cc_cncn 
  MATRIX_VECTOR_PRODUCT 
-`"])
-mt_cncn(["`label=mt_cncn 
+"])
+mt_cncn(["label=mt_cncn 
  MORE_THAN 
-`"])
-cm_cnpb(["`label=cm_cnpb 
+"])
+cm_cnpb(["label=cm_cnpb 
  CONTACT_MATRIX 
-`"])
-cc_cnpb(["`label=cc_cnpb 
+"])
+cc_cnpb(["label=cc_cnpb 
  MATRIX_VECTOR_PRODUCT 
-`"])
-mt_cnpb(["`label=mt_cnpb 
+"])
+mt_cnpb(["label=mt_cnpb 
  MORE_THAN 
-`"])
-cm_cnI(["`label=cm_cnI 
+"])
+cm_cnI(["label=cm_cnI 
  CONTACT_MATRIX 
-`"])
-cc_cnI(["`label=cc_cnI 
+"])
+cc_cnI(["label=cc_cnI 
  MATRIX_VECTOR_PRODUCT 
-`"])
-mt_cnI(["`label=mt_cnI 
+"])
+mt_cnI(["label=mt_cnI 
  MORE_THAN 
-`"])
-mm(["`label=mm 
+"])
+mm(["label=mm 
  CUSTOM
-FUNC=x\*y\*z 
-`"])
-ff(["`label=ff 
+FUNC=x*y*z 
+"])
+ff(["label=ff 
  SUM 
-`"])
+"])
 end
 cm_cncn -- cm_cncn.w --> cc_cncn
 linkStyle 2 stroke:red,color:red;
@@ -281,9 +274,9 @@ ones64 -- ones64 --> cc_cnpb
 linkStyle 8 stroke:blue,color:blue;
 cc_cnpb -- cc_cnpb --> mt_cnpb
 linkStyle 9 stroke:blue,color:blue;
-ones192(["`label=ones192 
+ones192(["label=ones192 
  CONSTANT 
-`"])
+"])
 Box -- Box --> cm_cnI
 linkStyle 10 stroke:red,color:red;
 MD --> cm_cnI
@@ -303,16 +296,9 @@ linkStyle 17 stroke:blue,color:blue;
 mm -- mm --> ff
 linkStyle 18 stroke:blue,color:blue;
 ff -- ff --> rr
-rr(["`label=rr 
+rr(["label=rr 
  RESTRAINT 
-`"])
-ff -- ff --> 24
-rr -- rr.bias --> 24
-rr -- rr.force2 --> 24
-24("`label=#64;24 
- PRINT
-FILE=colvar 
-`")
+"])
 ```
 
 You can clearly see from this diagram that all the actions that are needed to calculate the final biased quantity ff are in the same subgraph.  We thus calculate the derivatives of ff with respect to the input 
@@ -320,63 +306,63 @@ atomic positions in the forward loop so the forces from the restraint can be pas
 
 ```mermaid
 flowchart BT 
-rr(["`label=rr 
+rr(["label=rr 
  RESTRAINT 
-`"])
+"])
 rr -- ff --> ff
 subgraph subcm_cncn [cm_cncn]
-cm_cncn(["`label=cm_cncn 
+cm_cncn(["label=cm_cncn 
  CONTACT_MATRIX 
-`"])
-cc_cncn(["`label=cc_cncn 
+"])
+cc_cncn(["label=cc_cncn 
  MATRIX_VECTOR_PRODUCT 
-`"])
+"])
 cm_cncn -. cm_cncn.w .-> cc_cncn
 linkStyle 1 stroke:red,color:red;
-mt_cncn(["`label=mt_cncn 
+mt_cncn(["label=mt_cncn 
  MORE_THAN 
-`"])
+"])
 cc_cncn -. cc_cncn .-> mt_cncn
 linkStyle 2 stroke:blue,color:blue;
-cm_cnpb(["`label=cm_cnpb 
+cm_cnpb(["label=cm_cnpb 
  CONTACT_MATRIX 
-`"])
-cc_cnpb(["`label=cc_cnpb 
+"])
+cc_cnpb(["label=cc_cnpb 
  MATRIX_VECTOR_PRODUCT 
-`"])
+"])
 cm_cnpb -. cm_cnpb.w .-> cc_cnpb
 linkStyle 3 stroke:red,color:red;
-mt_cnpb(["`label=mt_cnpb 
+mt_cnpb(["label=mt_cnpb 
  MORE_THAN 
-`"])
+"])
 cc_cnpb -. cc_cnpb .-> mt_cnpb
 linkStyle 4 stroke:blue,color:blue;
-cm_cnI(["`label=cm_cnI 
+cm_cnI(["label=cm_cnI 
  CONTACT_MATRIX 
-`"])
-cc_cnI(["`label=cc_cnI 
+"])
+cc_cnI(["label=cc_cnI 
  MATRIX_VECTOR_PRODUCT 
-`"])
+"])
 cm_cnI -. cm_cnI.w .-> cc_cnI
 linkStyle 5 stroke:red,color:red;
-mt_cnI(["`label=mt_cnI 
+mt_cnI(["label=mt_cnI 
  MORE_THAN 
-`"])
+"])
 cc_cnI -. cc_cnI .-> mt_cnI
 linkStyle 6 stroke:blue,color:blue;
-mm(["`label=mm 
+mm(["label=mm 
  CUSTOM
-FUNC=x\*y\*z 
-`"])
+FUNC=x*y*z 
+"])
 mt_cncn -. mt_cncn .-> mm
 linkStyle 7 stroke:blue,color:blue;
 mt_cnpb -. mt_cnpb .-> mm
 linkStyle 8 stroke:blue,color:blue;
 mt_cnI -. mt_cnI .-> mm
 linkStyle 9 stroke:blue,color:blue;
-ff(["`label=ff 
+ff(["label=ff 
  SUM 
-`"])
+"])
 mm -. mm .-> ff
 linkStyle 10 stroke:blue,color:blue;
 end
@@ -390,9 +376,9 @@ subgraph subcm_cncn [cm_cncn]
 end
 cc_cnI -- ones192 --> ones192
 linkStyle 17 stroke:blue,color:blue;
-ones192(["`label=ones192 
+ones192(["label=ones192 
  CONSTANT 
-`"])
+"])
 subgraph subcm_cncn [cm_cncn]
 end
 cc_cnpb -- ones64 --> ones64
@@ -401,12 +387,12 @@ subgraph subcm_cncn [cm_cncn]
 end
 cc_cncn -- ones64 --> ones64
 linkStyle 19 stroke:blue,color:blue;
-ones64(["`label=ones64 
+ones64(["label=ones64 
  CONSTANT 
-`"])
-Box{{"`label=Box 
+"])
+Box("label=Box 
  PBC 
-`"}}
+")
 cm_cnI -- Box --> Box
 linkStyle 20 stroke:red,color:red;
 cm_cnI --> MD
@@ -419,7 +405,7 @@ cm_cnpb -- Box --> Box
 linkStyle 24 stroke:red,color:red;
 cm_cnpb --> MD
 linkStyle 25 stroke:violet,color:violet;
-MD{{positions from MD}}
+MD(positions from MD)
 ```
 
 In other words, we can quickly prototype a really rather complicated CV directly from the input file.  Furthermore, because this complicated CV is constructed from simpler pieces it is 
