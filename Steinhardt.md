@@ -293,7 +293,15 @@ PRINT ARG=lav FILE=colvar
 ```
 
 The point I want to make with this input is that the heart of this process of taking a local average of a symmetry function involves multiplying the vector of symmetry function 
-values by a contact matrix.  With that in mind lets now consder the full input for the Leichner and Delago order parameters, which is as follows:
+values by a contact matrix.  In other words, the locally averaged coordination number $\widehat{c}(i)$ can be computed as:
+
+$$
+\widehat{c}(i) = \frac{c(i) + \sum_{j\ne i} \sigma(r_{ij})c(j)}{1 + \sum_{j\ne i} \sigma(r_{ij})} 
+$$
+
+where $\sigma(r_{ij})$ is a switching function that acts on the distance $r_{ij}$ between atom $i$ and atom $j$ and $c(i)$ is the coordination number of atom $i$.
+
+With that in mind lets now consder the full input for the Leichner and Delago order parameters, which is as follows:
 
 ```plumed
 # This is the usual input that we have for computing the Steinhardt parameters that is explained above.
@@ -338,5 +346,18 @@ aq1: CUSTOM ARG=aq1_2 FUNC=sqrt(x) PERIODIC=NO
 PRINT ARG=aq1 FILE=colvar
 ```
 
+Notice that we do the same here as we did with the coordination number input.  In other wordsd, we calculate locally-averaged versions of the $q_{lm}(i)$ parameters using:
+
+$$
+\widehat{q_{lm}}(i) = \frac{q_{lm}(i) + \sum_{j\ne i} \sigma(r_{ij})q_{lm}(j)}{1 + \sum_{j\ne i} \sigma(r_{ij})}
+$$
+
+The final locally averaged version of $\overline{q}_l(i)$ is then defined as:
+
+$$
+q_{l}(i) = \sqrt{ \sum_{m=-l}^l | \widehat{q}_{lm}(i) |^2 }
+$$
+
+which is the familiar summing over the $l$ values that we have seen in earlier sectioms to make the final symmetry function rotationally invariant.
 
 # Calculating tenr-Wolde-Frenkel-style Steinhard order parameters 
