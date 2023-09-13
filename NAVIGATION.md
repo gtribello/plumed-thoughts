@@ -39,6 +39,7 @@ flowchart TB;
   I --> L
   B --> M
   K --> M
+  L --> N
   click A "Passing.md" "8th May 2023: General thoughts about how data is passed between PLUMED actions";
   click B "Reproducibility.md" "8th May 2023: General thoughts about why we want to do calculations that are reproducibile";
   click C "Community.md" "8th May 2023: General thoughts about how we support communities of scholars"
@@ -52,4 +53,5 @@ flowchart TB;
   click K "contactMatrix.md" "12th June 2023: An explanation of how coordination numbers and contact maps can be used to construct CVs"
   click L "Tasks.md" "13th June 2023: More details on how the task list are used in the calculation of MultiColvars and contact matrix based CVs"
   click M "Sprint.md" "3rd July 2023: Details on how SPRINT collective variables are implemented using shortcuts"
+  click N "Steinhardt.md" "13th September 2023: An explanation of how Steinhardt parameters are implemented in PLUMED"
 ```
