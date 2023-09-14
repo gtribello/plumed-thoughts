@@ -240,7 +240,7 @@ PRINT ARG=q1_mean FILE=colvar
 The quantity that has been computed by this input is:
 
 $$
-\langle q_l \rangle = \sqrt{ \sum_{m=-l}^l | \langle q_{lm}} \rangle^2 } \qquad \textrm{where} \qquad \langle q_{lm} \rangle = \frac{1}{N} \sum_{i=1}^N q_{lm}(i) 
+\langle q_l \rangle = \sqrt{ \sum_{m=-l}^l | \langle q_{lm} \rangle |^2 } \qquad \textrm{where} \qquad \langle q_{lm} \rangle = \frac{1}{N} \sum_{i=1}^N q_{lm}(i) 
 $$
 
 This quantity can also be calculated using the following shortcut input:
