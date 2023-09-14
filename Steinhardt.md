@@ -189,7 +189,7 @@ PRINT ARG=q1_mean FILE=colvar
 The average that is being calculated here is:
 
 $$
-\overline{q_l} = \frac{1}{N} \sum_{i=1}^N q_l(i)
+\langle q_l \rangle = \frac{1}{N} \sum_{i=1}^N q_l(i)
 $$
 
 which is also what is computed if we use the following shortcut:
@@ -240,7 +240,7 @@ PRINT ARG=q1_mean FILE=colvar
 The quantity that has been computed by this input is:
 
 $$
-\widehat{q_l} = \sqrt{ \sum_{m=-l}^l | \overline{q_{lm}} |^2 } \qquad \textrm{where} \qquad \overline{q_{lm}} = \frac{1}{N} \sum_{i=1}^N q_{lm}(i) 
+\langle q_l \rangle = \sqrt{ \sum_{m=-l}^l | \langle q_{lm}} \rangle^2 } \qquad \textrm{where} \qquad \langle q_{lm} \rangle = \frac{1}{N} \sum_{i=1}^N q_{lm}(i) 
 $$
 
 This quantity can also be calculated using the following shortcut input:
@@ -346,18 +346,223 @@ aq1: CUSTOM ARG=aq1_2 FUNC=sqrt(x) PERIODIC=NO
 PRINT ARG=aq1 FILE=colvar
 ```
 
-Notice that we do the same here as we did with the coordination number input.  In other wordsd, we calculate locally-averaged versions of the $q_{lm}(i)$ parameters using:
+Notice that we do the same here as we did with the coordination number input.  In other words, we calculate locally-averaged versions of the $q_{lm}(i)$ parameters using:
 
 $$
-\widehat{q_{lm}}(i) = \frac{q_{lm}(i) + \sum_{j\ne i} \sigma(r_{ij})q_{lm}(j)}{1 + \sum_{j\ne i} \sigma(r_{ij})}
+\widehat{q}{lm}(i) = \frac{q_{lm}(i) + \sum_{j\ne i} \sigma(r_{ij})q_{lm}(j)}{1 + \sum_{j\ne i} \sigma(r_{ij})}
 $$
 
-The final locally averaged version of $\overline{q}_l(i)$ is then defined as:
+The final, locally-averaged version of $\widehat{q}_l(i)$ is then defined as:
 
 $$
-q_{l}(i) = \sqrt{ \sum_{m=-l}^l | \widehat{q}_{lm}(i) |^2 }
+\widehat{q}_{l}(i) = \sqrt{ \sum_{m=-l}^l | \widehat{q}_{lm}(i) |^2 }
 $$
 
 which is the familiar summing over the $l$ values that we have seen in earlier sectioms to make the final symmetry function rotationally invariant.
 
-# Calculating tenr-Wolde-Frenkel-style Steinhard order parameters 
+# Calculating ten-Wolde-Frenkel-style Steinhard order parameters
+
+Before discussing how the ten-Wolde-Frenkel order parameters are computed it is useful to introduce yet another variant on the Steinhardt parameter.  This variant is computed as follows
+
+$$
+\overline{q}_{lm}(i) = \frac{1}{\overline{q}_l} \sum_{j \ne i } \sigma(r_{ij})Y_l^m(\theta_{ij},\phi_{ij}) \qquad \textrm{where} \qquad \overline{q}_l(i) = \sqrt{ \sum_{m=-l}^l |q_{lm}(i)|^2 }
+$$ 
+
+As always $\sigma(r_{ij})$ is a switching function that acts on the distance, $r_{ij}$, between atom $i$ and atom $j$.  $Y_l^m(\theta_{ij},\phi_{ij})$ is then the spherical harmonic function which depends
+on the direction the bond between atom $i$ and atom $j$ point in.  Notice that this version of the Steinhardt parameter has the followign property:
+
+$$
+\sum_{m=-l}^l \overline{q}_{lm}(i)^{*} \overline{q}_{lm}(i) = 1
+$$
+
+We can compute the $\overline{q}_{lm}(i)$ values in PLUMED using the following input:
+
+```plumed
+# This is the usual input that we have for computing the Steinhardt parameters that is explained above.
+cmat: CONTACT_MATRIX GROUP=1-100 COMPONENTS SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+ones: ONES SIZE=100
+coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones 
+sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
+sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones
+# This calculates the sum of the squares of the unormalized \overline{q}_lm(i) values.
+q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=sp.q1-rm-n1,sp.q1-im-n1,sp.q1-rm-0,sp.q1-im-0,sp.q1-rm-p1,sp.q1-im-p1
+# This calculates \overline{q}_l(i)
+q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO
+# Create a 100 x 6 matrix to hold all the unofrmalised \overline{q}_lm(i) values.
+stack: VSTACK ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+# Create a second 100 x 6 matrix.  All the columns of this matrix are identical.  They just contain the 100 \overline{q}_l(i) values.
+lones: ONES SIZE=6
+unorm: OUTER_PRODUCT ARG=q1,lones
+# We can now calculate the \overline{q}_lm(i) values by dividing the unormalised values by the \overline{q}_l(i).
+# The output here is a 100 x 6 matrix
+oq1: CUSTOM ARG=stack,oq1 FUNC=x/y PERIODIC=NO
+# And finally print out the 100 x 6 matrix of overline{q}_lm(i) values.
+PRINT ARG=oq1 FILE=colvar
+```
+
+We introduce $\overline{q}_{lm}(i)$ as we can use the following inner product to measure the similarity between the environment around atom $i$ and the environment around atom $j$:
+
+$$
+S_{ij} = \sum_{m=-l}^l \overline{q}_{lm}(i)^{*} \overline{q}_{lm}(j)
+$$
+
+Notice furthermore that if we have $N$ atoms we can store all the real and imaginary parts of the $\overline{q}_{lm}(i)$ values in an $N \times 2l$ matrix $\mathbf{Q}$.  The 
+inner product above can be computed for every pair of atoms in our system by doing the following piece of matrix algebra:
+
+$$
+\mathbf{S} = \mathbf{Q} \mathbf{Q}^T
+$$
+
+$S$ here is thus an $N\times N$ square matrix.  To calculate this matrix in PLUMED you would do the following:
+
+```plumed
+# These lines compute the matrix of \overline{q}_lm(i) values in the way described above
+cmat: CONTACT_MATRIX GROUP=1-100 COMPONENTS SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+ones: ONES SIZE=100
+coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones  
+sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
+sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones
+q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=sp.q1-rm-n1,sp.q1-im-n1,sp.q1-rm-0,sp.q1-im-0,sp.q1-rm-p1,sp.q1-im-p1
+q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO 
+stack: VSTACK ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+lones: ONES SIZE=6
+unorm: OUTER_PRODUCT ARG=q1,lones
+oq1: CUSTOM ARG=stack,oq1 FUNC=x/y PERIODIC=NO
+# Now transpose the matrix of \overline{q}_lm(i) values
+oq1T: TRANSPOSE ARG=oq1
+# Calculate the matrix product
+s: MATRIX_PRODUCT ARG=oq1,oq1T
+# And output the 100 x 100 matrix of inner products
+PRINT ARG=s FILE=colvar
+```
+
+The matrix $\mathbf{S} defined above is not the one used when you are computing the ten-Wolde and Frenkel style order parametres.  Element $i,j$ of the matrix, $\mathbf{F}$, that is used when computing the ten-Wolde and Frenkel style order 
+parameters is large when atoms $i$ and $j$ are within a certain cutoff of each other AND when the environment around the two atoms are similar.  Element $i,j$ of this matrix is thus computed as:
+
+$$
+F_{ij} = \sigma(r_{ij}) \sum_{m=-l}^l \overline{q}_{lm}(i)^{*} \overline{q}_{lm}(j)
+$$
+
+where $\sigma$ is a switching function that acts on the distance $r_{ij}$ between atom $i$ and atom $j$.  The full matrix can be computed in PLUMED using the following input:
+
+```plumed
+# These lines compute the matrix of \overline{q}_lm(i) values in the way described above
+cmat: CONTACT_MATRIX GROUP=1-100 COMPONENTS SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+ones: ONES SIZE=100
+coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
+sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
+sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones
+q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=sp.q1-rm-n1,sp.q1-im-n1,sp.q1-rm-0,sp.q1-im-0,sp.q1-rm-p1,sp.q1-im-p1
+q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO 
+stack: VSTACK ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+lones: ONES SIZE=6
+unorm: OUTER_PRODUCT ARG=q1,lones
+oq1: CUSTOM ARG=stack,oq1 FUNC=x/y PERIODIC=NO
+# Now transpose the matrix of \overline{q}_lm(i) values
+oq1T: TRANSPOSE ARG=oq1
+# Calculate a second contact matrix.  This will contain the \sigma(r_ij) values in the second equation above.
+cmat2: CONTACT_MATRIX GROUP=1-100 SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+# Calculate the matrix product, S, described above
+s: MATRIX_PRODUCT ARG=oq1,oq1T
+# Now take the element-wise product of the contact matrix and the matrix of inner products.
+f: CUSTOM ARG=cmat2.w,s FUNC=x*y PERIODIC=NO
+# And output the 100 x 100 matrix 
+PRINT ARG=f FILE=colvar
+```
+
+Once you ahve computed the matrix $F$ there are many things that you can do with it.  You can for instance sum all the elements of the matrix using an input like this:
+
+```plumed
+# These lines compute the matrix F
+cmat: CONTACT_MATRIX GROUP=1-100 COMPONENTS SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+ones: ONES SIZE=100
+coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
+sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
+sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones
+q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=sp.q1-rm-n1,sp.q1-im-n1,sp.q1-rm-0,sp.q1-im-0,sp.q1-rm-p1,sp.q1-im-p1
+q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO
+stack: VSTACK ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+lones: ONES SIZE=6
+unorm: OUTER_PRODUCT ARG=q1,lones
+oq1: CUSTOM ARG=stack,oq1 FUNC=x/y PERIODIC=NO
+oq1T: TRANSPOSE ARG=oq1
+cmat2: CONTACT_MATRIX GROUP=1-100 SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+s: MATRIX_PRODUCT ARG=oq1,oq1T
+f: CUSTOM ARG=cmat2.w,s FUNC=x*y PERIODIC=NO
+# Add all the elemnets of the matrix f together
+fs: SUM ARG=f PERIODIC=NO
+# This outputs a single scalar
+PRINT ARG=fs FILE=colvar
+```
+
+Some people prefer to apply a switching function to the elements of $F$ before summing like this:
+
+```plumed
+# These lines compute the matrix F
+cmat: CONTACT_MATRIX GROUP=1-100 COMPONENTS SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+ones: ONES SIZE=100
+coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
+sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
+sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones
+q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=sp.q1-rm-n1,sp.q1-im-n1,sp.q1-rm-0,sp.q1-im-0,sp.q1-rm-p1,sp.q1-im-p1
+q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO
+stack: VSTACK ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+lones: ONES SIZE=6
+unorm: OUTER_PRODUCT ARG=q1,lones
+oq1: CUSTOM ARG=stack,oq1 FUNC=x/y PERIODIC=NO
+oq1T: TRANSPOSE ARG=oq1
+cmat2: CONTACT_MATRIX GROUP=1-100 SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+s: MATRIX_PRODUCT ARG=oq1,oq1T
+f: CUSTOM ARG=cmat2.w,s FUNC=x*y PERIODIC=NO
+# Tranform all the elements of f with a switching function that is one when f_ij>0.5
+fmt: MORE_THAN ARG=f SWITCH={RATIONAL R_0=0.5}
+# Add all the elemnets of the matrix fmt together
+fs: SUM ARG=fmt PERIODIC=NO
+# This outputs a single scalar 
+PRINT ARG=fs FILE=colvar
+```
+
+You could even apply the switching function to $S$ and only then multiply the transformed version of $S$ by the second contact matrix.
+Alternatively, you can calculate a new symmetry function for each of the atoms in your system by multiplying $F$ by a vector of all ones as following:
+
+```plumed
+cmat: CONTACT_MATRIX GROUP=1-100 COMPONENTS SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+ones: ONES SIZE=100
+coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
+sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
+sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones    
+q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=sp.q1-rm-n1,sp.q1-im-n1,sp.q1-rm-0,sp.q1-im-0,sp.q1-rm-p1,sp.q1-im-p1
+q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO
+stack: VSTACK ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+lones: ONES SIZE=6
+unorm: OUTER_PRODUCT ARG=q1,lones
+oq1: CUSTOM ARG=stack,oq1 FUNC=x/y PERIODIC=NO
+oq1T: TRANSPOSE ARG=oq1
+cmat2: CONTACT_MATRIX GROUP=1-100 SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+s: MATRIX_PRODUCT ARG=oq1,oq1T
+f: CUSTOM ARG=cmat2.w,s FUNC=x*y PERIODIC=NO  
+# This outputs a vector with 100 elements 
+lq1: MATRIX_VECTOR_PRODUCT ARG=f,ones 
+# This prints the 100 symmetry function values to the file colvar
+PRINT ARG=lq1 FILE=colvar
+```
+
+There is a shortcut that does the same as this last input which works as follows:
+
+```plumed
+# Calculate the steinhardt parameters
+q1: Q1 SPECIES=1-100 SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+# Calculate the local steinhard parameters
+lq1: LOCAL_Q1 SPECIES=q1 SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+# Print the local steinhardt parameters
+PRINT ARG=lq1 FILE=colvar
+```
+
+## Conclusion
+
+The implementation of the Steinhardt parameters in previous versions of PLUMED grew rather organically, which made the code confusing and difficult to use.  I hope this article 
+convinces readers that the changes that have been made are worthwhile.  This new structure exposes the linear algebra that is being used to compute all the variants on these particular
+order parameters in the input file.  It is thus easier to determine what PLUMED is actually computing.  
+
+All the old inputs should still work as I have included shortcuts that reproduce new-style input files that reproduce what PLUMED used to do in the past.  However, I hope that folks will not use 
+these shortcuts in the future as when these new inputs are used it is much easier for folks to understand what has been done.
