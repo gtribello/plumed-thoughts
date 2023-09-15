@@ -145,15 +145,11 @@ by `c1` immediately after they are calculated.  Furthermore, if one were to sum 
 shown below:
 
 ```mermaid
-flowchart TB 
-MD(positions from MD)
-Box("label=Box 
- PBC 
-")
-Box -- Box --> c1
-linkStyle 0 stroke:red,color:red;
-MD --> c1
-linkStyle 1 stroke:violet,color:violet;
+flowchart BT 
+10(["label=#64;10 
+ BIASVALUE 
+"])
+10 -- sums --> sums
 subgraph subc1 [c1]
 subgraph subc1_mat [c1]
 c1(["label=c1 
@@ -172,39 +168,47 @@ s(["label=s
 "])
 end
 style subc1_mat fill:lightblue
+c1 -. c1.x .-> r
+linkStyle 1 stroke:red,color:red;
+c1 -. c1.y .-> r
+linkStyle 2 stroke:red,color:red;
+c1 -. c1.z .-> r
+linkStyle 3 stroke:red,color:red;
+c1 -. c1.w .-> f
+linkStyle 4 stroke:red,color:red;
+c1 -. c1.x .-> f
+linkStyle 5 stroke:red,color:red;
+c1 -. c1.y .-> f
+linkStyle 6 stroke:red,color:red;
+c1 -. c1.z .-> f
+linkStyle 7 stroke:red,color:red;
+r -. r .-> f
+linkStyle 8 stroke:red,color:red;
+f -. f .-> s
+linkStyle 9 stroke:red,color:red;
 sums(["label=sums 
  SUM 
 "])
+s -. s .-> sums
+linkStyle 10 stroke:blue,color:blue;
 end
-c1 -- c1.x --> r
-linkStyle 2 stroke:red,color:red;
-c1 -- c1.y --> r
-linkStyle 3 stroke:red,color:red;
-c1 -- c1.z --> r
-linkStyle 4 stroke:red,color:red;
-c1 -- c1.w --> f
-linkStyle 5 stroke:red,color:red;
-c1 -- c1.x --> f
-linkStyle 6 stroke:red,color:red;
-c1 -- c1.y --> f
-linkStyle 7 stroke:red,color:red;
-c1 -- c1.z --> f
-linkStyle 8 stroke:red,color:red;
-r -- r --> f
-linkStyle 9 stroke:red,color:red;
+sums == sums ==> c1
+sums == sums ==> s
+subgraph subc1 [c1]
+end
+s -- ones --> ones
+linkStyle 13 stroke:blue,color:blue;
 ones(["label=ones 
  CONSTANT 
 "])
-f -- f --> s
-linkStyle 10 stroke:red,color:red;
-ones -- ones --> s
-linkStyle 11 stroke:blue,color:blue;
-s -- s --> sums
-linkStyle 12 stroke:blue,color:blue;
-sums -- sums --> 10
-10(["label=#64;10 
- BIASVALUE 
-"])
+Box("label=Box 
+ PBC 
+")
+c1 -- Box --> Box
+linkStyle 14 stroke:red,color:red;
+c1 --> MD
+linkStyle 15 stroke:violet,color:violet;
+MD(positions from MD)
 ```
 
 This is possible because the chain of actions the $(i,j)$ matrix elements for `r` and `f` (and their derivatives with respect to the atomic positions) are calculated immediately after $(i,j)$ matrix elements
