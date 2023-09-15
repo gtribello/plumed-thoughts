@@ -37,10 +37,12 @@ flowchart TB;
   I --> K
   K --> L[the task list]
   I --> L
-  B --> M
+  B --> M[Sprint]
   K --> M
-  L --> N
-  L --> O
+  L --> Q[Symmetry functions]
+  Q --> N[Steinhardt parameters]
+  Q --> O[Behler Symmetry functions]
+  Q --> P[Volumes]
   click A "Passing.md" "8th May 2023: General thoughts about how data is passed between PLUMED actions";
   click B "Reproducibility.md" "8th May 2023: General thoughts about why we want to do calculations that are reproducibile";
   click C "Community.md" "8th May 2023: General thoughts about how we support communities of scholars"
@@ -55,5 +57,7 @@ flowchart TB;
   click L "Tasks.md" "13th June 2023: More details on how the task list are used in the calculation of MultiColvars and contact matrix based CVs"
   click M "Sprint.md" "3rd July 2023: Details on how SPRINT collective variables are implemented using shortcuts"
   click N "Steinhardt.md" "13th September 2023: An explanation of how Steinhardt parameters are implemented in PLUMED"
-  click O "Behler.md" "14th September 2023: An explanation of how Behler-Parinello symmetry functions are implemnted in PLUMED"
+  click O "Behler.md" "14th September 2023: An explanation of how Behler-Parinello symmetry functions are implemented in PLUMED"
+  click P "Volumes.md" "15th September 2023: Information on how you can use PLUMED to calculate the number of atoms and average for a symmetry function in a region"
+  click Q "SymmetryFunction.md" "15th September 2023: Information on how you can use PLUMED to calculate symmetry functions"
 ```
