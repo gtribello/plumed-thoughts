@@ -50,6 +50,7 @@ PRINT ARG=sumsp
 
 As PBCs are applied on the distances calculated in the action `sp` using the FIXEDATOM `f` at (0,0,0) ensures that the sphere is centered on the center of the simulation cell.
 
+
 ## Calculating the average value of a CV in a region
 
 You may be wondering why, in the inputs that I have shown thus far, vectors that tell us whether each atom is inside or outside the region of interest are computed and exposed in the input.
