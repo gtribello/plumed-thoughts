@@ -43,6 +43,8 @@ flowchart TB;
   Q --> N[Steinhardt parameters]
   Q --> O[Behler Symmetry functions]
   Q --> P[Volumes]
+  B --> R[Averaging]
+  R --> S[Histograms]
   click A "Passing.md" "8th May 2023: General thoughts about how data is passed between PLUMED actions";
   click B "Reproducibility.md" "8th May 2023: General thoughts about why we want to do calculations that are reproducibile";
   click C "Community.md" "8th May 2023: General thoughts about how we support communities of scholars"
@@ -60,4 +62,6 @@ flowchart TB;
   click O "Behler.md" "14th September 2023: An explanation of how Behler-Parinello symmetry functions are implemented in PLUMED"
   click P "Volumes.md" "15th September 2023: Information on how you can use PLUMED to calculate the number of atoms and average for a symmetry function in a region"
   click Q "SymmetryFunction.md" "15th September 2023: Information on how you can use PLUMED to calculate symmetry functions"
+  click R "averaging.md" "11th December 2023: Averages in the new version of PLUMED and thoughts about indistinguisability"
+  click S "histograms.md" 11th December 2023: Histograms in the new version of PLUMED"
 ```
