@@ -125,7 +125,7 @@ The example input file below shows how you can gather all the data from all repl
 
 ```plumed
 d1: DISTANCE ATOMS=1,2
-r1: RESTRAINT ARG=d1 AT=@replicas{1.0,1.2,1.4,1.6} KAPPA=10
+r1: RESTRAINT ARG=d1 AT=@replicas:1.0,1.2,1.4,1.6 KAPPA=10
 r1g: GATHER_REPLICAS ARG=r1.bias
 PRINT ARG=r1g.rep-1,,r1g.rep-2,r1g.rep-3,r1g.rep-4 FILE=colvar
 ```
