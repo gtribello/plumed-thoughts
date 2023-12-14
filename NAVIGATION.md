@@ -63,5 +63,5 @@ flowchart TB;
   click P "Volumes.md" "15th September 2023: Information on how you can use PLUMED to calculate the number of atoms and average for a symmetry function in a region"
   click Q "SymmetryFunction.md" "15th September 2023: Information on how you can use PLUMED to calculate symmetry functions"
   click R "averaging.md" "11th December 2023: Averages in the new version of PLUMED and thoughts about indistinguisability"
-  click S "histograms.md" 11th December 2023: Histograms in the new version of PLUMED"
+  click S "histograms.md" "11th December 2023: Histograms in the new version of PLUMED"
 ```
