@@ -39,6 +39,7 @@ flowchart TB;
   I --> L
   B --> M[Sprint]
   K --> M
+  K --> T[Clusters]
   L --> Q[Symmetry functions]
   Q --> N[Steinhardt parameters]
   Q --> O[Behler Symmetry functions]
@@ -64,4 +65,5 @@ flowchart TB;
   click Q "SymmetryFunction.md" "15th September 2023: Information on how you can use PLUMED to calculate symmetry functions"
   click R "averaging.md" "11th December 2023: Averages in the new version of PLUMED and thoughts about indistinguisability"
   click S "histograms.md" "11th December 2023: Histograms in the new version of PLUMED"
+  click T "Clusters.md" "28th Feburary 2024: DFS clustering in the new version of PLUMED"
 ```
