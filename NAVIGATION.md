@@ -46,6 +46,9 @@ flowchart TB;
   Q --> P[Volumes]
   B --> R[Averaging]
   R --> S[Histograms]
+  D --> U[RMSD]
+  U --> V[Paths]
+  K --> V
   click A "Passing.md" "8th May 2023: General thoughts about how data is passed between PLUMED actions";
   click B "Reproducibility.md" "8th May 2023: General thoughts about why we want to do calculations that are reproducibile";
   click C "Community.md" "8th May 2023: General thoughts about how we support communities of scholars"
@@ -66,4 +69,6 @@ flowchart TB;
   click R "averaging.md" "11th December 2023: Averages in the new version of PLUMED and thoughts about indistinguisability"
   click S "histograms.md" "11th December 2023: Histograms in the new version of PLUMED"
   click T "Clusters.md" "28th Feburary 2024: DFS clustering in the new version of PLUMED"
+  click U "RMSD.md" "29th February 2024: Some thoughts on RMSD and ways of getting simplifying the code by getting rid of the reference class"
+  click V "Path.md" "29th February 2024: Implementing PATH and GPROPERTYMAP using the new functionality"
 ```
