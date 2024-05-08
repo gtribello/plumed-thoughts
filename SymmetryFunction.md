@@ -8,7 +8,7 @@ using inputs such as the one below:
 c1: CONTACT_MATRIX GROUP=1-7 SWITCH={RATIONAL R_0=2.6 NN=6 MM=12}
 # Calculate the coordination numbers for the 7 atoms by a vector that contains all ones
 ones: ONES SIZE=7
-cc: MATRIX_VECTOR_PRODUCT ARG=c1.w,ones
+cc: MATRIX_VECTOR_PRODUCT ARG=c1,ones
 # And output the 7 coordination numbers for the atoms
 PRINT ARG=cc FILE=colvar
 ``` 

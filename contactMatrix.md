@@ -10,7 +10,7 @@ and print the coordination numbers of the first 7 atoms in the system with thems
 ```plumed
 c1: CONTACT_MATRIX GROUP=1-7 SWITCH={RATIONAL R_0=2.6 NN=6 MM=12}
 ones: ONES SIZE=7
-cc: MATRIX_VECTOR_PRODUCT ARG=c1.w,ones
+cc: MATRIX_VECTOR_PRODUCT ARG=c1,ones
 PRINT ARG=cc FILE=colvar
 ```
 
@@ -34,7 +34,7 @@ We also use these chains of actions when passing matrices.  When we compute the 
 c1: CONTACT_MATRIX GROUP=1-7 SWITCH={RATIONAL R_0=2.6 NN=6 MM=12}
 # Calculate the coordination numbers for the first seven atoms in the system
 ones: ONES SIZE=7
-cc: MATRIX_VECTOR_PRODUCT ARG=c1.w,ones
+cc: MATRIX_VECTOR_PRODUCT ARG=c1,ones
 # Set the ith element of the vector mtc equal to one if the coordination number of atom i is greater than 3.
 mtc: MORE_THAN ARG=cc SWITCH={RATIONAL D_0=3 R_0=1}
 # Calculate the number of atoms with a coordination number greater than 3.
@@ -175,14 +175,14 @@ ones64: ONES SIZE=64
 # Contact matrix that determines if methylamonium molecules are within 8 A of each other
 cm_cncn: CONTACT_MATRIX GROUP=cn SWITCH={RATIONAL R_0=0.8}
 # Coordination number of methylamounium with methylamonium
-cc_cncn: MATRIX_VECTOR_PRODUCT ARG=cm_cncn.w,ones64
+cc_cncn: MATRIX_VECTOR_PRODUCT ARG=cm_cncn,ones64
 # Vector with elements that are one if coordiantion of methylamonium with methylamonium >5
 mt_cncn: MORE_THAN ARG=cc_cncn SWITCH={RATIONAL R_0=5 NN=12 MM=24}
 
 # Contact matrix that determines if methylamoinium moleulcule and Pb atom are within 7.5 A of each other
 cm_cnpb: CONTACT_MATRIX GROUPA=cn GROUPB=Pb SWITCH={RATIONAL R_0=0.75}
 # Coordination number of methylamonium with Pb
-cc_cnpb: MATRIX_VECTOR_PRODUCT ARG=cm_cnpb.w,ones64
+cc_cnpb: MATRIX_VECTOR_PRODUCT ARG=cm_cnpb,ones64
 # Vector with elements that are one if coordination of methylamounium with lead is >7
 mt_cnpb: MORE_THAN ARG=cc_cnpb SWITCH={RATIONAL R_0=7 NN=12 MM=24}
 
@@ -190,14 +190,14 @@ ones192: ONES SIZE=192
 # Contact matrix that determines if methylamoinium moleulcule and I atom are within 6.5 A of each other
 cm_cnI: CONTACT_MATRIX GROUPA=cn GROUPB=I SWITCH={RATIONAL R_0=0.65}
 # Coordination number of methylamonium with I
-cc_cnI: MATRIX_VECTOR_PRODUCT ARG=cm_cnI.w,ones192
+cc_cnI: MATRIX_VECTOR_PRODUCT ARG=cm_cnI,ones192
 # Vector with elements that are one if coordination of methylamounium with lead is >11
 mt_cnI: MORE_THAN ARG=cc_cnI SWITCH={RATIONAL R_0=11 NN=12 MM=24}
 
 # Element wise product of these three input vectors.
 # mm[i]==1 if coordination number of corrsponding methylamounium with methylamonium is >5
 # and if coordination of methylamounium with Pb is >7 and if coordination of methylamounium with I > 11
-mm: CUSTOM ARG1=mt_cncn ARG2=mt_cnpb ARG3=mt_cnI FUNC=x*y*z PERIODIC=NO
+mm: CUSTOM ARG=mt_cncn,mt_cnpb,mt_cnI FUNC=x*y*z PERIODIC=NO
 
 # Sum of coordination numbers and thus equal to number of methylamoniums with desired coordination numbers
 ff: SUM ARG=mm PERIODIC=NO

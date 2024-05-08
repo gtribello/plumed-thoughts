@@ -83,12 +83,12 @@ When this is expanded you have the following:
 ```plumed
 t1: TORSION ATOMS=1,2,3,4
 a1_weight: CONSTANT VALUES=1
-a1_denom ACCUMULATE ARG=a1_weight 
+a1_denom: ACCUMULATE ARG=a1_weight 
 a1_sin: CUSTOM ARG=t1,a1_weight FUNC=y*sin((x+pi)/1) PERIODIC=NO
-a1_sin: CUSTOM ARG=t1,a1_weight FUNC=y*cos((x+pi)/1) PERIODIC=NO
+a1_cos: CUSTOM ARG=t1,a1_weight FUNC=y*cos((x+pi)/1) PERIODIC=NO
 t1_sinsum: ACCUMULATE ARG=a1_sin STRIDE=1
 t1_cossum: ACCUMULATE ARG=a1_cos STRIDE=1
-a1: CUSTOM ARG=a1_sinsum,a1_cossum,a1_denom FUNC=-pi+1*atan2(x/z,y/z) PERIODIC=-pi,pi
+a1: CUSTOM ARG=t1_sinsum,t1_cossum,a1_denom FUNC=-pi+1*atan2(x/z,y/z) PERIODIC=-pi,pi
 PRINT ARG=a1 FILE=average STRIDE=1
 ```
 
@@ -99,8 +99,8 @@ Readers of the manual can thus see how the average is calculated in a way that t
 Suppose that you have an input file that calculates the coordination numbers of 100 atoms like the one shown below:
 
 ```plumed
-c1: COORDINATIONNUMBER SPECIES=1-100 SWITCH={RATIONAL R_0=1}
-a1: ACCUMULATE ARG=c1 STRIDE=1
+# c1: COORDINATIONNUMBER SPECIES=1-100 SWITCH={RATIONAL R_0=1}
+# a1: ACCUMULATE ARG=c1 STRIDE=1
 ```
 
 Should `a1`, the value that is output by the ACCUMULATE action here be a scalar or a vector?  In other words, should PLUMED assume that the user wants to add all 100 numbers calculated by the 
@@ -124,6 +124,7 @@ averaging makes things pretty straightforward and transparent.
 The example input file below shows how you can gather all the data from all replicas in one place using the GATHER_REPLICAS command:
 
 ```plumed
+#SETTINGS NREPLICAS=4
 d1: DISTANCE ATOMS=1,2
 r1: RESTRAINT ARG=d1 AT=@replicas:1.0,1.2,1.4,1.6 KAPPA=10
 r1g: GATHER_REPLICAS ARG=r1.bias
@@ -139,8 +140,8 @@ d1: DISTANCE ATOMS=1,2
 d1g: GATHER_REPLICAS ARG=d1
 d1s: COMBINE ARG=d1.* PERIODIC=NO
 a1_weight: CONSTANT VALUES=4
-a1_denom: ACCUMULATE ARG=d1s STRIDE=1
-a1_numer: ACCUMULATE ARG=a1_prod STRIDE=1
+a1_denom: ACCUMULATE ARG=a1_weight STRIDE=1
+a1_numer: ACCUMULATE ARG=d1s STRIDE=1
 a1: CUSTOM ARG=a1_numer,a1_denom FUNC=x/y PERIODIC=NO
 PRINT ARG=a1 FILE=average STRIDE=1
 ```

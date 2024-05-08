@@ -13,7 +13,7 @@ Now, however, the same operation is achieved by the following code:
 ```plumed
 d1: DISTANCE ATOMS1=1,2 ATOMS2=3,4 ATOMS3=5,6 ATOMS4=7,8 ATOMS5=9,10
 d1_lt: LESS_THAN ARG=d1 SWITCH={RATIONAL R_0=0.1}
-d1_lessthan: SUM ARG=d1l PERIODIC=NO
+d1_lessthan: SUM ARG=d1_lt PERIODIC=NO
 PRINT ARG=d1_lessthan FILE=colvar
 ``` 
 
@@ -64,7 +64,7 @@ As explained above, once the shortcuts have worked their magic PLUMED will actua
 # This is the expanded shortcut
 d1: DISTANCE ATOMS1=1,2 ATOMS2=3,4 ATOMS3=5,6 ATOMS4=7,8 ATOMS5=9,10
 d1_lt: LESS_THAN ARG=d1 SWITCH={RATIONAL R_0=0.1}
-d1_lessthan: SUM ARG=d1l PERIODIC=NO
+d1_lessthan: SUM ARG=d1_lt PERIODIC=NO
 # This is not part of the expanded shortcut
 PRINT ARG=d1.lessthan FILE=colvar
 ``` 

@@ -9,7 +9,7 @@ input something like this:
 ```plumed
 # This will output a vector with 99 components.  Each component of this vector is calculated
 # by applying a switching function on the distance between atom 1 and one of the atoms in the system
-sp: INSPHERE ATOMS=2-100 CENTER=1 RADIUS={SWITCH R_0=1.0}
+sp: INSPHERE ATOMS=2-100 CENTER=1 RADIUS={RATIONAL R_0=1.0}
 # This adds together all the elements of sp
 sumsp: SUM ARG=sp PERIODIC=NO
 # And this prints the final scalar quantity that tells you how many atoms are in the sphere to a file.
@@ -43,7 +43,7 @@ to define a virtual atom at the origin using FIXEDATOM like this:
 
 ```plumed
 f: FIXEDATOM AT=0,0,0
-sp: INSPHERE CENTER=f ATOMS=1-100 RADIUS={SWITCH R_0=1.0}
+sp: INSPHERE CENTER=f ATOMS=1-100 RADIUS={RATIONAL R_0=1.0}
 sumsp: SUM ARG=sp PERIODIC=NO
 PRINT ARG=sumsp
 ```
@@ -69,7 +69,7 @@ f: FIXEDATOM AT=0,0,0
 # Calculate the coordination numbers in the usual way
 cmat: CONTACT_MATRIX GROUP=1-100 SWITCH={RATIONAL R_0=0.1}
 ones: ONES SIZE=100
-c1: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
+c1: MATRIX_VECTOR_PRODUCT ARG=cmat,ones
 # Now calculate whether each atom is within the region of interest.  These is the vector of 100 v_i values in the expression above.
 sp: INSPHERE ATOMS=1-100 CENTER=f RADIUS={RATIONAL R_0=1.0}
 # Now calculate another vector of v_i c_i values.  This action returns a vector with 100 elements.

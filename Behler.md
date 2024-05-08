@@ -17,9 +17,9 @@ In this expression, $f_c$ is a switching function and $R_{ij}$ is the distance b
 using PLUMED we can use the following input.
 
 ```plumed
-cmat: CONTACT_MATRIX SPECIES=1-100 SWITCH={COSINE R_0=4.5}
+cmat: CONTACT_MATRIX GROUP=1-100 SWITCH={CUSTOM R_0=4.5 D_MAX=4.5 FUNC=0.5*(cos(pi*x)+1)}
 ones: ONES SIZE=100
-g1: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
+g1: MATRIX_VECTOR_PRODUCT ARG=cmat,ones
 # This will print out the 100 coordination number values calculated by the input above.
 PRINT ARG=g1 FILE=colvar
 ```
@@ -40,7 +40,7 @@ these variables within PLUMED and need to implement nothing new.  We can simply 
 
 ```plumed
 # Calculate the contact matrix.  Element i,j of this matrix tells you if atoms i and j are within a certain cutoff of each other
-cmat: CONTACT_MATRIX SPECIES=1-100 COMPONETS SWITCH={COSINE R_0=4.5}
+cmat: CONTACT_MATRIX GROUP=1-100 COMPONENTS SWITCH={CUSTOM R_0=4.5 D_MAX=4.5 FUNC=0.5*(cos(pi*x)+1)}
 # Now calculate a matrix with all the R_ij values
 cmatr: CUSTOM ARG=cmat.x,cmat.y,cmat.z FUNC=sqrt(x*x+y*y+z*z) PERIODIC=NO
 # Compute the quantity in the summation in the expression for G^2.  The output here is a 100x100 matrix.
@@ -62,11 +62,11 @@ coordination sphere using an input like this one.  A similar input (see below) c
 
 ```plumed
 # Calculate the contact matrix.  Element i,j of this matrix tells you if atoms i and j are within a certain cutoff of each other
-cmat: CONTACT_MATRIX SPECIES=1-100 COMPONETS SWITCH={COSINE R_0=4.5}
+cmat: CONTACT_MATRIX GROUP=1-100 COMPONENTS SWITCH={CUSTOM R_0=4.5 D_MAX=4.5 FUNC=0.5*(cos(pi*x)+1)}
 # Now calculate a matrix with all the R_ij values
 cmatr: CUSTOM ARG=cmat.x,cmat.y,cmat.z FUNC=sqrt(x*x+y*y+z*z) PERIODIC=NO
 # Now calculate the fcc cubic parameter for each bond.  This outputs a matrix
-fcc_f: CUSTOM ARG=cmat.x,cmat.y.cmat.z,cmatr FUNC=((x**4)*(y**4)+(x**4)*(z**4)+(y**4)*(z**4))/(r**8)-27*(x**4)*(y**4)*(z**4)/(r**12) VAR=x,y,z,r PERIODIC=NO
+fcc_f: CUSTOM ARG=cmat.x,cmat.y,cmat.z,cmatr FUNC=((x^4)*(y^4)+(x^4)*(z^4)+(y^4)*(z^4))/(r^8)-27*(x^4)*(y^4)*(z^4)/(r^12) VAR=x,y,z,r PERIODIC=NO
 # And multiply the above by the weights to get another 100 x 100 matrix
 wfcc_f: CUSTOM ARG=fcc_f,cmat.w FUNC=x*y PERIODIC=NO
 # Now sum the rows of the matrix above to get a vector with 100 elements.  One symmetry function for each atom. 
@@ -99,11 +99,11 @@ Even this complicated function can be calculated directly in PLUMED.  The input 
 
 ```plumed
 # Calculate the distances between atom one and all the other atoms
-d1: DISTANCE ATOMS1=1,2 ATOMS2=1,3 ATOMS3=1,4 ATOMS4=1,5 ATOMS6=1,7 ATOMS7=1,8 ...
+d1: DISTANCE ATOMS1=1,2 ATOMS2=1,3 ATOMS3=1,4 ATOMS4=1,5 ATOMS5=1,7 ATOMS6=1,8
 # Now transform the distances above by a switching function
-d1lt: LESS_THAN ARG=d1 SWITCH={COSINE R_0=4.5}
+d1lt: LESS_THAN ARG=d1 SWITCH={CUSTOM R_0=4.5 D_MAX=4.5 FUNC=0.5*(cos(pi*x)+1)}
 # Calculate the vectors between atom one and all the other atoms
-d1c: DISTANCE COMPONENTS ATOMS1=1,2 ATOMS2=1,3 ATOMS3=1,4 ATOMS4=1,5 ATOMS6=1,7 ATOMS7=1,8 ...
+d1c: DISTANCE COMPONENTS ATOMS1=1,2 ATOMS2=1,3 ATOMS3=1,4 ATOMS4=1,5 ATOMS5=1,7 ATOMS6=1,8 
 # Now calculate the lengths of all the vectors connecting atom 1 to the other atoms
 d1r2: COMBINE ARG=d1c.x,d1c.y,d1c.z POWERS=2,2,2 PERIODIC=NO
 d1r: CUSTOM ARG=d1r2 FUNC=sqrt(x) PERIODIC=NO
@@ -119,7 +119,7 @@ wmat: OUTER_PRODUCT ELEMENTS_ON_DIAGONAL_ARE_ZERO ARG=d1lt,d1lt
 stackT: TRANSPOSE ARG=stack
 cmat: MATRIX_PRODUCT ARG=stack,stackT
 # Now compute a matrix containing (1 + \lambda cos(\theta_ijk))^3
-pmat: CUSTOM ARG=cmat PERIODIC=NO FUNC=(1+3*cos(x))**3 
+pmat: CUSTOM ARG=cmat PERIODIC=NO FUNC=(1+3*cos(x))^3 
 # And a matrix containing in which element j,k is R_ij^2 + R_ik^2 
 smat: OUTER_PRODUCT ARG=d1r2,d1r2 FUNC=x+y 
 # Now take the exponential of this matrix
@@ -142,7 +142,7 @@ as follows:
 ```plumed
 # Calculate the contact matrix and the x,y and z components of the bond vectors
 # This action calculates 4 100x100 matrices
-cmat: CONTACT_MATRIX GROUP=1-100 SWITCH={COSINE R_0=4.5} COMPONENTS
+cmat: CONTACT_MATRIX GROUP=1-100 SWITCH={CUSTOM R_0=4.5 D_MAX=4.5 FUNC=0.5*(cos(pi*x)+1)} COMPONENTS
 
 # Compute the symmetry function for the 100 atoms from the 4 100x100 matrices output
 # by cmat.  The output from this action is a vector with 100 elements
@@ -168,7 +168,7 @@ Furthermore we can calculate more than one function of these four quantities at 
 ```plumed
 # Calculate the contact matrix and the x,y and z components of the bond vectors
 # This action calculates 4 100x100 matrices
-cmat: CONTACT_MATRIX GROUP=1-100 SWITCH={COSINE R_0=4.5} COMPONENTS
+cmat: CONTACT_MATRIX GROUP=1-100 SWITCH={CUSTOM R_0=4.5 D_MAX=4.5 FUNC=0.5*(cos(pi*x)+1)} COMPONENTS
 
 # Compute the 4 symmetry function below for the 100 atoms from the 4 100x100 matrices output
 # by cmat.  The output from this action is a vector with 100 elements
@@ -181,7 +181,7 @@ beh3: GSYMFUNC_THREEBODY ...
 ...
 
 # Print the 4 sets of 100 symmetry function values to a file
-PRINT ARG=beh3.g3,beh3.g5,beh3.g6,beh3.g7 FILE=colvar
+PRINT ARG=beh3.g4,beh3.g5,beh3.g6,beh3.g7 FILE=colvar
 ```
 
 As we saw for the radial symmetry function, we thus again have an implementation of these angular symmetry functions that can be quickly used to prototype new function types.

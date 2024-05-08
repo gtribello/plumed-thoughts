@@ -17,7 +17,7 @@ The actual input that plumed uses to run this calculation is as follows:
 # Calculate the rmsd distance between all the instantaneous configuration
 # and all the waypoints that are in the file all.pdb.  This action returns a 
 # vector of squared distances from these waypoints
-p_data: RMSD SQUARED REFENCE=all.pdb
+p_data: RMSD SQUARED REFERENCE=all.pdb
 # Find the shortest distance between the path and the reference configurations
 p_mindist: LOWEST ARG=p_data 
 # Now calcluate the weight for each point in the path

@@ -18,9 +18,9 @@ When PLUMED reads this it creates the more complicated input file shown below fo
 # Calculate a contact matrix that tells us about the bond between these 7 atoms
 s1_mat: CONTACT_MATRIX GROUP=1-7 SWITCH={RATIONAL R_0=2.6 NN=6 MM=12} 
 # Calculate the principle eigenvalue of the contact matrix and its corresponding eigenvector
-s1_diag: DIAGONALIZE ARG=s1_mat VEC=1
+s1_diag: DIAGONALIZE ARG=s1_mat VECTORS=1
 # Scale the eigenvector by multiplying it by the square root of the number of atoms and the corresponding eigenvalue 
-s1_sp: CUSTOM ARG=d1_diag.vals-1,s1_diag.vecs-1 FUNC=sqrt(7)*x*y PERIODIC=NO
+s1_sp: CUSTOM ARG=s1_diag.vals-1,s1_diag.vecs-1 FUNC=sqrt(7)*x*y PERIODIC=NO
 # Sort the compnents of scaled eigenvector 
 s1: SORT ARG=s1_sp
 ```
