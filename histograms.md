@@ -52,7 +52,7 @@ hA_icov: CUSTOM ARG=hA_cov FUNC=1/x PERIODIC=NO
 # volume of the kernel is one.
 hA_h: CUSTOM ARG=hA_sigma FUNC=1/(x*sqrt(2*pi)) PERIODIC=NO
 hA_weight: CONSTANT VALUES=1
-hA_kde: KDE ARG=x GRID_MIN=0.0 GRID_MAX=3.0 GRID_BIN=100 HEIGHTS=ha_h METRIC=hA_icov
+hA_kde: KDE ARG=x GRID_MIN=0.0 GRID_MAX=3.0 GRID_BIN=100 HEIGHTS=hA_h METRIC=hA_icov
 hA_kdep: CUSTOM ARG=hA_kde,hA_weight FUNC=x*y PERIODIC=NO
 hA_u: ACCUMULATE ARG=hA_kdep STRIDE=1
 hA_nsum: ACCUMULATE ARG=hA_weight STRIDE=1
@@ -95,14 +95,14 @@ d1: DISTANCE ATOMS1=1,2 ATOMS2=1,3 ATOMS3=1,4 ATOMS4=1,5 ATOMS5=2,3 ATOMS6=2,4 A
 d1lt: LESS_THAN ARG=d1 SWITCH={RATIONAL D_0=2.0 R_0=0.5 D_MAX=5.0}
 
 d1c: DISTANCE ATOMS1=2,1 ATOMS2=3,1 ATOMS3=4,1 ATOMS4=5,1 ATOMS5=3,2 ATOMS6=4,2 ATOMS7=5,2 ATOMS8=4,3 ATOMS9=5,3 ATOMS10=5,4 COMPONENTS
-d2: COMBINE ARG1=d1c.x ARG2=d1c.y ARG3=d1c.z POWERS=2,2,2 PERIODIC=NO
-aa: MATHEVAL ARG1=d1c.z ARG2=d2 FUNC=acos(x/sqrt(y)) PERIODIC=NO
+d2: COMBINE ARG=d1c.x,d1c.y,d1c.z POWERS=2,2,2 PERIODIC=NO
+aa: CUSTOM ARG=d1c.z,d2 FUNC=acos(x/sqrt(y)) PERIODIC=NO
 
 dd0: FIXEDATOM AT=0,0,0
 ddx: FIXEDATOM AT=1,0,0
 ddz: FIXEDATOM AT=0,0,1
 
-tt: TORSIONS ...
+tt: TORSION ...
    VECTORA1=2,1 VECTORB1=ddx,dd0 AXIS1=ddz,dd0
    VECTORA2=3,1 VECTORB2=ddx,dd0 AXIS2=ddz,dd0
    VECTORA3=4,1 VECTORB3=ddx,dd0 AXIS3=ddz,dd0
@@ -118,8 +118,8 @@ tt: TORSIONS ...
 hu: KDE VOLUMES=d1lt ARG=aa,tt GRID_BIN=20,20 GRID_MIN=0,-pi GRID_MAX=pi,pi BANDWIDTH=0.2,0.2
 de: SUM ARG=d1lt PERIODIC=NO
 h: CUSTOM ARG=hu,de FUNC=x/y PERIODIC=NO
-h_ref: REFERENCE_GRID VALUE=h_ref REFERENCE=reference.grid
-klg: CUSTOM ARG=h,h_ref FUNC=y*log(y/0.5*(x+y))) PERIODIC=NO
+h_ref: REFERENCE_GRID FUNC=1 GRID_BIN=20,20 GRID_MIN=0,-pi GRID_MAX=pi,pi PERIODIC=NO,NO
+klg: CUSTOM ARG=h,h_ref FUNC=y*log(y/0.5*(x+y)) PERIODIC=NO
 kl: INTEGRATE_GRID ARG=klg PERIODIC=NO
 
 RESTRAINT ARG=kl AT=1.0 KAPPA=10
@@ -155,6 +155,7 @@ If you implement this (and the related PAIRENTROPIES) shortcuts in a single acti
 If you are running a simulation with four replicas you can construct a histogram using all the data from the replicas by using an input like the one shown below:
 
 ```plumed
+#SETTINGS NREPLICAS=4
 d1: DISTANCE ATOMS=1,2
 d1c: GATHER_REPLICAS ARG=d1
 d1v: CONCATENATE ARG=d1c.*
@@ -177,8 +178,8 @@ Over the last few years researchers from Michele's group and I wrote functionali
 value of some atom-based order parameter at each point in the simulation cell.  With the new version of PLUMED there is no need to implement a second MULTICOLVARDENS action as you can calculate these fields by using the KDE command directly as shown below:
 
 ```plumed
-f: FIXED_ATOM AT=0,0,0
-c1: COORDINATIONNUMBER SPECIES=1-100
+f: FIXEDATOM AT=0,0,0
+c1: COORDINATIONNUMBER SPECIES=1-100 SWITCH={RATIONAL R_0=0.1}
 d1: DISTANCES COMPONENTS ORIGIN=f ATOMS=1-100
 p_numer: KDE VOLUMES=c1 ARG=d1.x,d1.y,d1.z GRID_BIN=100,100,100 BANDWIDTH=0.1,0.1,0.1
 p_denom: KDE ARG=d1.x,d1.y,d1.z GRID_BIN=100,100,100 BANDWIDTH=0.1,0.1,0.1
