@@ -118,8 +118,7 @@ tt: TORSION ...
 hu: KDE VOLUMES=d1lt ARG=aa,tt GRID_BIN=20,20 GRID_MIN=0,-pi GRID_MAX=pi,pi BANDWIDTH=0.2,0.2
 de: SUM ARG=d1lt PERIODIC=NO
 h: CUSTOM ARG=hu,de FUNC=x/y PERIODIC=NO
-h_ref: REFERENCE_GRID FUNC=1 GRID_BIN=20,20 GRID_MIN=0,-pi GRID_MAX=pi,pi PERIODIC=NO,NO
-klg: CUSTOM ARG=h,h_ref FUNC=y*log(y/0.5*(x+y)) PERIODIC=NO
+klg: CUSTOM ARG=h FUNC=log(1/x) PERIODIC=NO
 kl: INTEGRATE_GRID ARG=klg PERIODIC=NO
 
 RESTRAINT ARG=kl AT=1.0 KAPPA=10
@@ -127,7 +126,7 @@ RESTRAINT ARG=kl AT=1.0 KAPPA=10
 
 This input looks at the instantaneous distribution of $\theta$ and $\phi$ angles for the bonds between atoms and their neighbours in the first coordination sphere.  $\phi$ is defined as the angle between the vector connecting the two atoms and the positive $z$ direction.
 $\theta$ is then the torsional angle between the bond and the positive $x$ direction.  In other words, $\theta$ and $\phi$ are the second two spherical polar coordinates.  You can see that we construct the instantaneous distribution of bonds in this spheircal polar direction
-and then compute the Kulbeck-Leibler divergence between this instantaneous distribution and a refernece configuration that is read from a file called "reference.grid."  Notice, finally, that we can add a restraint on this very complicated CV and that PLUMED will work out the 
+and then compute the Kulbeck-Leibler divergence between this instantaneous distribution and a reference uniform distribution.  Notice, finally, that we can add a restraint on this very complicated CV and that PLUMED will work out the 
 derivatives on the atoms using the chain rule for us.  
 
 ## The radial distribution function 

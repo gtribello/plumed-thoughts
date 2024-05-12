@@ -48,9 +48,9 @@ d1_ref: CONSTANT VALUE=0.1221
 d2_ref: CONSTANT VALUE=0.0979
 d3_ref: CONSTANT VALUE=0.1079
 
-v: CONSTANT VALUES=0.078811,-0.945732,-0.315244 NCOLS=3 NROWS=1
+v: CONSTANT VALUES=0.078811,-0.945732,-0.315244 
 disp: DISPLACEMENT ARG1=d1,d2,d3 ARG2=d1_ref,d2_ref,d3_ref
-pca: MATRIX_VECTOR_PRODUCT ARG=v,disp
+pca: MATRIX_VECTOR_PRODUCT ARG=disp,v
 PRINT ARG=pca
 ```
 
@@ -61,18 +61,18 @@ without writing new code by working in the input file directly.
 If users want a simpler syntax, however, there is a shortcut provided that allows them to get use the older syntax for PCAVARS.  For example, the input below will compute the same quantity as the second input above:
 
 ```plumed
-d1: DISTANCE ATOMS=1,2
-d2: DISTANCE ATOMS=3,4
-d3: DISTANCE ATOMS=5,6
+t1: DISTANCE ATOMS=1,2
+t2: DISTANCE ATOMS=3,4
+t3: DISTANCE ATOMS=5,6
 
-pca: PCAVARS ARG=d1,d2,d3 REFERENCE=epath.pdb
+pca: PCAVARS ARG=t1,t2,t3 REFERENCE=epath.pdb
 PRINT ARG=pca_eig FILE=colvar
 ```
 
 You can also use PCAVARS to compute the first input above as follows:
 
 ```plumed
-pca: PCAVARS REFERENCE=reference.pdb TYPE=OPTIMAL
+pca: PCAVARS REFERENCE=ref2.pdb TYPE=OPTIMAL
 PRINT ARG=pca.* FILE=colvar 
 ```
 
