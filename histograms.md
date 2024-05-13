@@ -154,7 +154,7 @@ If you implement this (and the related PAIRENTROPIES) shortcuts in a single acti
 If you are running a simulation with four replicas you can construct a histogram using all the data from the replicas by using an input like the one shown below:
 
 ```plumed
-#SETTINGS NREPLICAS=4
+#SETTINGS NREPLICAS=2
 d1: DISTANCE ATOMS=1,2
 d1c: GATHER_REPLICAS ARG=d1
 d1v: CONCATENATE ARG=d1c.*

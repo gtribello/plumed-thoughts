@@ -124,11 +124,11 @@ averaging makes things pretty straightforward and transparent.
 The example input file below shows how you can gather all the data from all replicas in one place using the GATHER_REPLICAS command:
 
 ```plumed
-#SETTINGS NREPLICAS=4
+#SETTINGS NREPLICAS=2
 d1: DISTANCE ATOMS=1,2
-r1: RESTRAINT ARG=d1 AT=@replicas:1.0,1.2,1.4,1.6 KAPPA=10
+r1: RESTRAINT ARG=d1 AT=@replicas:1.0,1.2 KAPPA=10
 r1g: GATHER_REPLICAS ARG=r1.bias
-PRINT ARG=r1g.rep-1,,r1g.rep-2,r1g.rep-3,r1g.rep-4 FILE=colvar
+PRINT ARG=r1g.rep-1,r1g.rep-2 FILE=colvar
 ```
 
 The GATHER_REPLICAS command creates one PLUMED value object for each replica. The $N$ values output by GATHER_REPLICA contain the values of the quantities on each of the $N$ replicas.  By using GATHER_REPLICAS you 

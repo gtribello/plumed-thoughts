@@ -436,7 +436,7 @@ s: MATRIX_PRODUCT ARG=oq1,oq1T
 PRINT ARG=s FILE=colvar
 ```
 
-The matrix $\mathbf{S} defined above is not the one used when you are computing the ten-Wolde and Frenkel style order parametres.  Element $i,j$ of the matrix, $\mathbf{F}$, that is used when computing the ten-Wolde and Frenkel style order 
+The matrix $\mathbf{S}$ defined above is not the one used when you are computing the ten-Wolde and Frenkel style order parametres.  Element $i,j$ of the matrix, $\mathbf{F}$, that is used when computing the ten-Wolde and Frenkel style order 
 parameters is large when atoms $i$ and $j$ are within a certain cutoff of each other AND when the environment around the two atoms are similar.  Element $i,j$ of this matrix is thus computed as:
 
 $$
