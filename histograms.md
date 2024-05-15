@@ -158,7 +158,7 @@ If you are running a simulation with four replicas you can construct a histogram
 d1: DISTANCE ATOMS=1,2
 d1c: GATHER_REPLICAS ARG=d1
 d1v: CONCATENATE ARG=d1c.*
-wh: CONSTANT VALUES=0.25,0.25,0.25,0.25
+wh: CONSTANT VALUES=0.25,0.25
 hA_weight: CONSTANT VALUES=1
 hA_kde: KDE ARG=d1v GRID_MIN=0.0 GRID_MAX=3.0 GRID_BIN=100 VOLUMES=wh BANDWIDTH=0.1
 hA_kdep: CUSTOM ARG=hA_kde,hA_weight FUNC=x*y PERIODIC=NO

@@ -45,48 +45,19 @@ BIASVALUE ARG=s
 
 for example, the diagram showing how data passes through the PLUMED actions as the values and derivatives are calculated is as follows:
 
-```mermaid
-flowchart TB
-MD(positions from MD)
-Box("label=Box 
- PBC
-")
-Box -- Box --> c1
-linkStyle 0 stroke:red,color:red;
-MD --> c1
-linkStyle 1 stroke:violet,color:violet;
-subgraph subc1 [c1]
-subgraph subc1_mat [c1]
-c1(["label=c1
- CONTACT_MATRIX
-"])
-cc(["label=cc
- MATRIX_VECTOR_PRODUCT
-"])
-end
-style subc1_mat fill:lightblue
-mtc(["label=mtc
- MORE_THAN
-"])
-s(["label=s
- SUM
-"])
-end
-ones(["label=ones
- CONSTANT
-"])
-c1 -- c1.w --> cc
-linkStyle 2 stroke:red,color:red;
-ones -- ones --> cc
-linkStyle 3 stroke:blue,color:blue;
-cc -- cc --> mtc
-linkStyle 4 stroke:blue,color:blue;
-mtc -- mtc --> s
-linkStyle 5 stroke:blue,color:blue;
-s -- s --> 8
-8(["label=#64;8
- BIASVALUE
-"])
+```plumed
+#SETTINGS MERMAID=value
+# Calculate the contact matrix for the first seven atoms in the system
+c1: CONTACT_MATRIX GROUP=1-7 SWITCH={RATIONAL R_0=2.6 NN=6 MM=12}
+# Calculate the coordination numbers for the first seven atoms in the system
+ones: ONES SIZE=7
+cc: MATRIX_VECTOR_PRODUCT ARG=c1,ones
+# Set the ith element of the vector mtc equal to one if the coordination number of atom i is greater than 3.
+mtc: MORE_THAN ARG=cc SWITCH={RATIONAL D_0=3 R_0=1}
+# Calculate the number of atoms with a coordination number greater than 3.
+s: SUM ARG=mtc PERIODIC=NO
+# Add a bias on s that is equal to the value of s
+BIASVALUE ARG=s
 ```
 
 Notice that the CONTACT_MATRIX, MATRIX_VECTOR_PRODUCT, MORE_THAN and SUM actions are all in the same subgraph.  The grouping of these actions indicates that the 
@@ -94,52 +65,19 @@ first row of the contact matrix is calculated at the same time as the first elem
 the second row of the matrix with label c1 once the first element of the vector mtc has been added to the scalar s.  Furthermore, the derivatives of s with respect to the 
 atoms input to c1 are accumulated during the forward loop.  Consequently, when the forces from the biasvalue are applied on s they are passed through the actions as shown below:
 
-```mermaid
-flowchart BT
-8(["label=#64;8
- BIASVALUE
-"])
-8 -- s --> s
-subgraph subc1 [c1]
-subgraph subc1_mat [c1]
-c1(["label=c1
- CONTACT_MATRIX
-"])
-cc(["label=cc
- MATRIX_VECTOR_PRODUCT
-"])
-end
-style subc1_mat fill:lightblue
-c1 -. c1.w .-> cc
-linkStyle 1 stroke:red,color:red;
-mtc(["label=mtc
- MORE_THAN
-"])
-cc -. cc .-> mtc
-linkStyle 2 stroke:blue,color:blue;
-s(["label=s
- SUM
-"])
-mtc -. mtc .-> s
-linkStyle 3 stroke:blue,color:blue;
-end
-s == s ==> c1
-s == s ==> cc
-subgraph subc1 [c1]
-end
-cc -- ones --> ones
-linkStyle 6 stroke:blue,color:blue;
-ones(["label=ones
- CONSTANT
-"])
-Box("label=Box
- PBC
-")
-c1 -- Box --> Box
-linkStyle 7 stroke:red,color:red;
-c1 --> MD
-linkStyle 8 stroke:violet,color:violet;
-MD(positions from MD)
+```plumed
+#SETTINGS MERMAID=force
+# Calculate the contact matrix for the first seven atoms in the system
+c1: CONTACT_MATRIX GROUP=1-7 SWITCH={RATIONAL R_0=2.6 NN=6 MM=12}
+# Calculate the coordination numbers for the first seven atoms in the system
+ones: ONES SIZE=7
+cc: MATRIX_VECTOR_PRODUCT ARG=c1,ones
+# Set the ith element of the vector mtc equal to one if the coordination number of atom i is greater than 3.
+mtc: MORE_THAN ARG=cc SWITCH={RATIONAL D_0=3 R_0=1}
+# Calculate the number of atoms with a coordination number greater than 3.
+s: SUM ARG=mtc PERIODIC=NO
+# Add a bias on s that is equal to the value of s
+BIASVALUE ARG=s
 ```
 
 In short, we do not need to calculate the matrix elements of c1 twice in order to apply the forces as we accumulate the derivatives of the final scalar s during the forward loop.
@@ -207,230 +145,94 @@ rr: RESTRAINT ARG=ff AT=62 KAPPA=10
 
 When the forward loop through the actions in the above input file is performed data is passed as follows:
 
-```mermaid
-flowchart TB 
-MD(positions from MD)
-Box("label=Box 
- PBC 
-")
-Pb("label=Pb 
- GROUP 
-")
-I("label=I 
- GROUP 
-")
-cn("label=cn 
- GROUP 
-")
-ones64(["label=ones64 
- CONSTANT 
-"])
-Box -- Box --> cm_cncn
-linkStyle 0 stroke:red,color:red;
-MD --> cm_cncn
-linkStyle 1 stroke:violet,color:violet;
-subgraph subcm_cncn [cm_cncn]
-subgraph subcm_cncn_mat [cm_cncn]
-cm_cncn(["label=cm_cncn 
- CONTACT_MATRIX 
-"])
-cc_cncn(["label=cc_cncn 
- MATRIX_VECTOR_PRODUCT 
-"])
-end
-style subcm_cncn_mat fill:lightblue
-mt_cncn(["label=mt_cncn 
- MORE_THAN 
-"])
-subgraph subcm_cnpb_mat [cm_cnpb]
-cm_cnpb(["label=cm_cnpb 
- CONTACT_MATRIX 
-"])
-cc_cnpb(["label=cc_cnpb 
- MATRIX_VECTOR_PRODUCT 
-"])
-end
-style subcm_cnpb_mat fill:lightblue
-mt_cnpb(["label=mt_cnpb 
- MORE_THAN 
-"])
-subgraph subcm_cnI_mat [cm_cnI]
-cm_cnI(["label=cm_cnI 
- CONTACT_MATRIX 
-"])
-cc_cnI(["label=cc_cnI 
- MATRIX_VECTOR_PRODUCT 
-"])
-end
-style subcm_cnI_mat fill:lightblue
-mt_cnI(["label=mt_cnI 
- MORE_THAN 
-"])
-mm(["label=mm 
- CUSTOM
-FUNC=x*y*z 
-"])
-ff(["label=ff 
- SUM 
-"])
-end
-cm_cncn -- cm_cncn.w --> cc_cncn
-linkStyle 2 stroke:red,color:red;
-ones64 -- ones64 --> cc_cncn
-linkStyle 3 stroke:blue,color:blue;
-cc_cncn -- cc_cncn --> mt_cncn
-linkStyle 4 stroke:blue,color:blue;
-Box -- Box --> cm_cnpb
-linkStyle 5 stroke:red,color:red;
-MD --> cm_cnpb
-linkStyle 6 stroke:violet,color:violet;
-cm_cnpb -- cm_cnpb.w --> cc_cnpb
-linkStyle 7 stroke:red,color:red;
-ones64 -- ones64 --> cc_cnpb
-linkStyle 8 stroke:blue,color:blue;
-cc_cnpb -- cc_cnpb --> mt_cnpb
-linkStyle 9 stroke:blue,color:blue;
-ones192(["label=ones192 
- CONSTANT 
-"])
-Box -- Box --> cm_cnI
-linkStyle 10 stroke:red,color:red;
-MD --> cm_cnI
-linkStyle 11 stroke:violet,color:violet;
-cm_cnI -- cm_cnI.w --> cc_cnI
-linkStyle 12 stroke:red,color:red;
-ones192 -- ones192 --> cc_cnI
-linkStyle 13 stroke:blue,color:blue;
-cc_cnI -- cc_cnI --> mt_cnI
-linkStyle 14 stroke:blue,color:blue;
-mt_cncn -- mt_cncn --> mm
-linkStyle 15 stroke:blue,color:blue;
-mt_cnpb -- mt_cnpb --> mm
-linkStyle 16 stroke:blue,color:blue;
-mt_cnI -- mt_cnI --> mm
-linkStyle 17 stroke:blue,color:blue;
-mm -- mm --> ff
-linkStyle 18 stroke:blue,color:blue;
-ff -- ff --> rr
-rr(["label=rr 
- RESTRAINT 
-"])
+```plumed
+#SETTINGS MERMAID=value
+# Lead ions
+Pb: GROUP ATOMS=1-64
+# Iodide atoms
+I: GROUP ATOMS=65-256
+# Methylamonium "atoms" -- in the real CV these are centers of mass rather than single atoms
+cn: GROUP ATOMS=257-320
+
+ones64: ONES SIZE=64
+# Contact matrix that determines if methylamonium molecules are within 8 A of each other
+cm_cncn: CONTACT_MATRIX GROUP=cn SWITCH={RATIONAL R_0=0.8}
+# Coordination number of methylamounium with methylamonium
+cc_cncn: MATRIX_VECTOR_PRODUCT ARG=cm_cncn,ones64
+# Vector with elements that are one if coordiantion of methylamonium with methylamonium >5
+mt_cncn: MORE_THAN ARG=cc_cncn SWITCH={RATIONAL R_0=5 NN=12 MM=24}
+
+# Contact matrix that determines if methylamoinium moleulcule and Pb atom are within 7.5 A of each other
+cm_cnpb: CONTACT_MATRIX GROUPA=cn GROUPB=Pb SWITCH={RATIONAL R_0=0.75}
+# Coordination number of methylamonium with Pb
+cc_cnpb: MATRIX_VECTOR_PRODUCT ARG=cm_cnpb,ones64
+# Vector with elements that are one if coordination of methylamounium with lead is >7
+mt_cnpb: MORE_THAN ARG=cc_cnpb SWITCH={RATIONAL R_0=7 NN=12 MM=24}
+
+ones192: ONES SIZE=192
+# Contact matrix that determines if methylamoinium moleulcule and I atom are within 6.5 A of each other
+cm_cnI: CONTACT_MATRIX GROUPA=cn GROUPB=I SWITCH={RATIONAL R_0=0.65}
+# Coordination number of methylamonium with I
+cc_cnI: MATRIX_VECTOR_PRODUCT ARG=cm_cnI,ones192
+# Vector with elements that are one if coordination of methylamounium with lead is >11
+mt_cnI: MORE_THAN ARG=cc_cnI SWITCH={RATIONAL R_0=11 NN=12 MM=24}
+
+# Element wise product of these three input vectors.
+# mm[i]==1 if coordination number of corrsponding methylamounium with methylamonium is >5
+# and if coordination of methylamounium with Pb is >7 and if coordination of methylamounium with I > 11
+mm: CUSTOM ARG=mt_cncn,mt_cnpb,mt_cnI FUNC=x*y*z PERIODIC=NO
+
+# Sum of coordination numbers and thus equal to number of methylamoniums with desired coordination numbers
+ff: SUM ARG=mm PERIODIC=NO
+
+rr: RESTRAINT ARG=ff AT=62 KAPPA=10
 ```
 
 You can clearly see from this diagram that all the actions that are needed to calculate the final biased quantity ff are in the same subgraph.  We thus calculate the derivatives of ff with respect to the input 
 atomic positions in the forward loop so the forces from the restraint can be passed backwards through the actions as follows:
 
-```mermaid
-flowchart BT 
-rr(["label=rr 
- RESTRAINT 
-"])
-rr -- ff --> ff
-subgraph subcm_cncn [cm_cncn]
-subgraph subcm_cncn_mat [cm_cncn]
-cm_cncn(["label=cm_cncn 
- CONTACT_MATRIX 
-"])
-cc_cncn(["label=cc_cncn 
- MATRIX_VECTOR_PRODUCT 
-"])
-end
-style subcm_cncn_mat fill:lightblue
-cm_cncn -. cm_cncn.w .-> cc_cncn
-linkStyle 1 stroke:red,color:red;
-mt_cncn(["label=mt_cncn 
- MORE_THAN 
-"])
-cc_cncn -. cc_cncn .-> mt_cncn
-linkStyle 2 stroke:blue,color:blue;
-subgraph subcm_cnpb_mat [cm_cnpb]
-cm_cnpb(["label=cm_cnpb 
- CONTACT_MATRIX 
-"])
-cc_cnpb(["label=cc_cnpb 
- MATRIX_VECTOR_PRODUCT 
-"])
-end
-style subcm_cnpb_mat fill:lightblue
-cm_cnpb -. cm_cnpb.w .-> cc_cnpb
-linkStyle 3 stroke:red,color:red;
-mt_cnpb(["label=mt_cnpb 
- MORE_THAN 
-"])
-cc_cnpb -. cc_cnpb .-> mt_cnpb
-linkStyle 4 stroke:blue,color:blue;
-subgraph subcm_cnI_mat [cm_cnI]
-cm_cnI(["label=cm_cnI 
- CONTACT_MATRIX 
-"])
-cc_cnI(["label=cc_cnI 
- MATRIX_VECTOR_PRODUCT 
-"])
-end
-style subcm_cnI_mat fill:lightblue
-cm_cnI -. cm_cnI.w .-> cc_cnI
-linkStyle 5 stroke:red,color:red;
-mt_cnI(["label=mt_cnI 
- MORE_THAN 
-"])
-cc_cnI -. cc_cnI .-> mt_cnI
-linkStyle 6 stroke:blue,color:blue;
-mm(["label=mm 
- CUSTOM
-FUNC=x*y*z 
-"])
-mt_cncn -. mt_cncn .-> mm
-linkStyle 7 stroke:blue,color:blue;
-mt_cnpb -. mt_cnpb .-> mm
-linkStyle 8 stroke:blue,color:blue;
-mt_cnI -. mt_cnI .-> mm
-linkStyle 9 stroke:blue,color:blue;
-ff(["label=ff 
- SUM 
-"])
-mm -. mm .-> ff
-linkStyle 10 stroke:blue,color:blue;
-end
-ff == ff ==> cm_cncn
-ff == ff ==> cc_cncn
-ff == ff ==> cm_cnpb
-ff == ff ==> cc_cnpb
-ff == ff ==> cm_cnI
-ff == ff ==> cc_cnI
-subgraph subcm_cncn [cm_cncn]
-end
-cc_cnI -- ones192 --> ones192
-linkStyle 17 stroke:blue,color:blue;
-ones192(["label=ones192 
- CONSTANT 
-"])
-subgraph subcm_cncn [cm_cncn]
-end
-cc_cnpb -- ones64 --> ones64
-linkStyle 18 stroke:blue,color:blue;
-subgraph subcm_cncn [cm_cncn]
-end
-cc_cncn -- ones64 --> ones64
-linkStyle 19 stroke:blue,color:blue;
-ones64(["label=ones64 
- CONSTANT 
-"])
-Box("label=Box 
- PBC 
-")
-cm_cnI -- Box --> Box
-linkStyle 20 stroke:red,color:red;
-cm_cnI --> MD
-linkStyle 21 stroke:violet,color:violet;
-cm_cncn -- Box --> Box
-linkStyle 22 stroke:red,color:red;
-cm_cncn --> MD
-linkStyle 23 stroke:violet,color:violet;
-cm_cnpb -- Box --> Box
-linkStyle 24 stroke:red,color:red;
-cm_cnpb --> MD
-linkStyle 25 stroke:violet,color:violet;
-MD(positions from MD)
+```plumed
+#SETTINGS MERMAID=force
+# Lead ions
+Pb: GROUP ATOMS=1-64
+# Iodide atoms
+I: GROUP ATOMS=65-256
+# Methylamonium "atoms" -- in the real CV these are centers of mass rather than single atoms
+cn: GROUP ATOMS=257-320
+
+ones64: ONES SIZE=64
+# Contact matrix that determines if methylamonium molecules are within 8 A of each other
+cm_cncn: CONTACT_MATRIX GROUP=cn SWITCH={RATIONAL R_0=0.8}
+# Coordination number of methylamounium with methylamonium
+cc_cncn: MATRIX_VECTOR_PRODUCT ARG=cm_cncn,ones64
+# Vector with elements that are one if coordiantion of methylamonium with methylamonium >5
+mt_cncn: MORE_THAN ARG=cc_cncn SWITCH={RATIONAL R_0=5 NN=12 MM=24}
+
+# Contact matrix that determines if methylamoinium moleulcule and Pb atom are within 7.5 A of each other
+cm_cnpb: CONTACT_MATRIX GROUPA=cn GROUPB=Pb SWITCH={RATIONAL R_0=0.75}
+# Coordination number of methylamonium with Pb
+cc_cnpb: MATRIX_VECTOR_PRODUCT ARG=cm_cnpb,ones64
+# Vector with elements that are one if coordination of methylamounium with lead is >7
+mt_cnpb: MORE_THAN ARG=cc_cnpb SWITCH={RATIONAL R_0=7 NN=12 MM=24}
+
+ones192: ONES SIZE=192
+# Contact matrix that determines if methylamoinium moleulcule and I atom are within 6.5 A of each other
+cm_cnI: CONTACT_MATRIX GROUPA=cn GROUPB=I SWITCH={RATIONAL R_0=0.65}
+# Coordination number of methylamonium with I
+cc_cnI: MATRIX_VECTOR_PRODUCT ARG=cm_cnI,ones192
+# Vector with elements that are one if coordination of methylamounium with lead is >11
+mt_cnI: MORE_THAN ARG=cc_cnI SWITCH={RATIONAL R_0=11 NN=12 MM=24}
+
+# Element wise product of these three input vectors.
+# mm[i]==1 if coordination number of corrsponding methylamounium with methylamonium is >5
+# and if coordination of methylamounium with Pb is >7 and if coordination of methylamounium with I > 11
+mm: CUSTOM ARG=mt_cncn,mt_cnpb,mt_cnI FUNC=x*y*z PERIODIC=NO
+
+# Sum of coordination numbers and thus equal to number of methylamoniums with desired coordination numbers
+ff: SUM ARG=mm PERIODIC=NO
+
+rr: RESTRAINT ARG=ff AT=62 KAPPA=10
+
 ```
 
 In other words, we can quickly prototype a really rather complicated CV directly from the input file.  Furthermore, because this complicated CV is constructed from simpler pieces it is 

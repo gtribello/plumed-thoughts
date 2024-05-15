@@ -13,36 +13,12 @@ PRINT ARG=d1s FILE=colvar
 In this article we are going to discuss how PLUMED does this calculation in a little more detail.  Lets therefore start by looking 
 at the graph that shows how data passes through the code in this calculation:
 
-```mermaid
-flowchart TB
-MD(positions from MD)
-Box("label=Box 
- PBC
-")
-Box -- Box --> d1
-linkStyle 0 stroke:red,color:red;
-MD --> d1
-linkStyle 1 stroke:violet,color:violet;
-subgraph subd1 [d1]
-d1(["label=d1
- DISTANCE
-"])
-d1l(["label=d1l
- LESS_THAN
-"])
-d1s(["label=d1s
- SUM
-"])
-end
-d1 -- d1 --> d1l
-linkStyle 2 stroke:blue,color:blue;
-d1l -- d1l --> d1s
-linkStyle 3 stroke:blue,color:blue;
-d1s -- d1s --> 6
-6("label=#64;6
- PRINT
-FILE=colvar
-")
+```plumed
+#SETTINGS MERMAID=value
+d1: DISTANCE ATOMS1=1,2 ATOMS2=3,4 ATOMS3=5,6
+d1l: LESS_THAN ARG=d1 SWITCH={RATIONAL R_0=0.1}
+d1s: SUM ARG=d1l PERIODIC=NO
+PRINT ARG=d1s FILE=colvar
 ```
 
 You can cleearly see that the actions d1, d1l and d1s are all in the same subgraph.  The calculation parts of these actions are thu all 
@@ -147,74 +123,19 @@ where $r_{ij}$ is the distance between atoms $i$ and $j$ and $\sigma_l$ is the s
 
 You can see the graph that shows how data passes through the code below:
 
-```mermaid
-flowchart TB 
-MD(positions from MD)
-Box("label=Box 
- PBC 
-")
-ones(["label=ones 
- CONSTANT 
-"])
-Box -- Box --> c1
-linkStyle 0 stroke:red,color:red;
-MD --> c1
-linkStyle 1 stroke:violet,color:violet;
-subgraph subc1 [c1]
-subgraph subc1_mat [c1]
-c1(["label=c1 
- CONTACT_MATRIX 
-"])
-cc1(["label=cc1 
- MATRIX_VECTOR_PRODUCT 
-"])
-end
-style subc1_mat fill:lightblue
-mt1(["label=mt1 
- MORE_THAN 
-"])
-subgraph subc2_mat [c2]
-c2(["label=c2 
- CONTACT_MATRIX 
-"])
-cc2(["label=cc2 
- MATRIX_VECTOR_PRODUCT 
-"])
-end
-style subc2_mat fill:lightblue
-mt2(["label=mt2 
- MORE_THAN 
-"])
-prod(["label=prod 
- CUSTOM
-FUNC=x*y 
-"])
-s(["label=s 
- SUM 
-"])
-end
-c1 -- c1.w --> cc1
-linkStyle 2 stroke:red,color:red;
-ones -- ones --> cc1
-linkStyle 3 stroke:blue,color:blue;
-cc1 -- cc1 --> mt1
-linkStyle 4 stroke:blue,color:blue;
-Box -- Box --> c2
-linkStyle 5 stroke:red,color:red;
-MD --> c2
-linkStyle 6 stroke:violet,color:violet;
-c2 -- c2.w --> cc2
-linkStyle 7 stroke:red,color:red;
-ones -- ones --> cc2
-linkStyle 8 stroke:blue,color:blue;
-cc2 -- cc2 --> mt2
-linkStyle 9 stroke:blue,color:blue;
-mt1 -- mt1 --> prod
-linkStyle 10 stroke:blue,color:blue;
-mt2 -- mt2 --> prod
-linkStyle 11 stroke:blue,color:blue;
-prod -- prod --> s
-linkStyle 12 stroke:blue,color:blue;
+```plumed
+#SETTINGS MERMAID=value
+ones: ONES SIZE=100
+c1: CONTACT_MATRIX GROUPA=1-10 GROUPB=11-110 SWITCH={RATIONAL R_0=0.3 D_MAX=0.5}
+cc1: MATRIX_VECTOR_PRODUCT ARG=c1,ones
+mt1: MORE_THAN ARG=cc1 SWITCH={RATIONAL R_0=1}
+
+c2: CONTACT_MATRIX GROUPA=1-10 GROUPB=101-200 SWITCH={RATIONAL R_0=0.1 D_MAX=0.3}
+cc2: MATRIX_VECTOR_PRODUCT ARG=c2,ones
+mt2: MORE_THAN ARG=cc2 SWITCH={RATIONAL R_0=4}
+
+prod: CUSTOM ARG=mt1,mt2 FUNC=x*y PERIODIC=NO
+s: SUM ARG=prod PERIODIC=NO
 ```
 
 This graph tells us that the whole calculation above is done when we call the calculate method for the action with label c1.  This method calls `runAllTasks` and the 

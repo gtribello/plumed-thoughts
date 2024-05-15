@@ -76,139 +76,40 @@ PRINT ARG=sums FILE=colvar
 
 The graph for this input is shown below:
 
-```mermaid
-flowchart TB 
-MD(positions from MD)
-Box("label=Box 
- PBC 
-")
-Box -- Box --> c1
-linkStyle 0 stroke:red,color:red;
-MD --> c1
-linkStyle 1 stroke:violet,color:violet;
-subgraph subc1 [c1]
-subgraph subc1_mat [c1]
-c1(["label=c1 
- CONTACT_MATRIX 
-"])
-r(["label=r 
- CUSTOM
-FUNC=sqrt(x*x+y*y+z*z) 
-"])
-f(["label=f 
- CUSTOM
-FUNC=w*(x^4+y^4+z^4)/(r^4) 
-"])
-s(["label=s 
- MATRIX_VECTOR_PRODUCT 
-"])
-end
-style subc1_mat fill:lightblue
-sums(["label=sums 
- SUM 
-"])
-end
-c1 -- c1.x --> r
-linkStyle 2 stroke:red,color:red;
-c1 -- c1.y --> r
-linkStyle 3 stroke:red,color:red;
-c1 -- c1.z --> r
-linkStyle 4 stroke:red,color:red;
-c1 -- c1.w --> f
-linkStyle 5 stroke:red,color:red;
-c1 -- c1.x --> f
-linkStyle 6 stroke:red,color:red;
-c1 -- c1.y --> f
-linkStyle 7 stroke:red,color:red;
-c1 -- c1.z --> f
-linkStyle 8 stroke:red,color:red;
-r -- r --> f
-linkStyle 9 stroke:red,color:red;
-ones(["label=ones 
- CONSTANT 
-"])
-f -- f --> s
-linkStyle 10 stroke:red,color:red;
-ones -- ones --> s
-linkStyle 11 stroke:blue,color:blue;
-s -- s --> sums
-linkStyle 12 stroke:blue,color:blue;
-sums -- sums --> 10
-10("label=#64;10 
- PRINT
-FILE=colvar 
-")
+```plumed
+#SETTINGS MERMAID=value
+# Calculate the contact matrix and the three matrices that contain the components of the vectors connecting atom i and atom j.  In other words, calculate four 7x7 matrices
+c1: CONTACT_MATRIX COMPONENTS GROUP=1-7 SWITCH={RATIONAL R_0=2.6 NN=6 MM=12}
+# This applies the function to the three input matrices element-wise and thus outputs a 7x7 matrix
+r: CUSTOM ARG=c1.x,c1.y,c1.z FUNC=sqrt(x*x+y*y+z*z) PERIODIC=NO
+# Again we are applying the function element wise to the five input matrices and thus outputting a 7x7 matrix
+f: CUSTOM ARG=c1.w,c1.x,c1.y,c1.z,r FUNC=w*(x^4+y^4+z^4)/(r^4) VAR=w,x,y,z,r PERIODIC=NO
+# We now multiply the 7x7 by a vector of ones to calculate the symmetry function
+ones: ONES SIZE=7
+s: MATRIX_VECTOR_PRODUCT ARG=f,ones
+# And print the sum of the symmetry function to a file
+sums: SUM ARG=s PERIODIC=NO
+PRINT ARG=sums FILE=colvar
 ```
 
 Notice that all the commands are done in a single chain.  There is no need to store any matrix elements as the functions in `r` and `f` are applied to the elements of the matrices calculated
 by `c1` immediately after they are calculated.  Furthermore, if one were to sum the elements of the vector `s` and add a bias upon the sum, the forces on `s` are passed back through the code as
 shown below:
 
-```mermaid
-flowchart BT 
-10(["label=#64;10 
- BIASVALUE 
-"])
-10 -- sums --> sums
-subgraph subc1 [c1]
-subgraph subc1_mat [c1]
-c1(["label=c1 
- CONTACT_MATRIX 
-"])
-r(["label=r 
- CUSTOM
-FUNC=sqrt(x*x+y*y+z*z) 
-"])
-f(["label=f 
- CUSTOM
-FUNC=w*(x^4+y^4+z^4)/(r^4) 
-"])
-s(["label=s 
- MATRIX_VECTOR_PRODUCT 
-"])
-end
-style subc1_mat fill:lightblue
-c1 -. c1.x .-> r
-linkStyle 1 stroke:red,color:red;
-c1 -. c1.y .-> r
-linkStyle 2 stroke:red,color:red;
-c1 -. c1.z .-> r
-linkStyle 3 stroke:red,color:red;
-c1 -. c1.w .-> f
-linkStyle 4 stroke:red,color:red;
-c1 -. c1.x .-> f
-linkStyle 5 stroke:red,color:red;
-c1 -. c1.y .-> f
-linkStyle 6 stroke:red,color:red;
-c1 -. c1.z .-> f
-linkStyle 7 stroke:red,color:red;
-r -. r .-> f
-linkStyle 8 stroke:red,color:red;
-f -. f .-> s
-linkStyle 9 stroke:red,color:red;
-sums(["label=sums 
- SUM 
-"])
-s -. s .-> sums
-linkStyle 10 stroke:blue,color:blue;
-end
-sums == sums ==> c1
-sums == sums ==> s
-subgraph subc1 [c1]
-end
-s -- ones --> ones
-linkStyle 13 stroke:blue,color:blue;
-ones(["label=ones 
- CONSTANT 
-"])
-Box("label=Box 
- PBC 
-")
-c1 -- Box --> Box
-linkStyle 14 stroke:red,color:red;
-c1 --> MD
-linkStyle 15 stroke:violet,color:violet;
-MD(positions from MD)
+```plumed
+#SETTINGS MERMAID=force
+# Calculate the contact matrix and the three matrices that contain the components of the vectors connecting atom i and atom j.  In other words, calculate four 7x7 matrices
+c1: CONTACT_MATRIX COMPONENTS GROUP=1-7 SWITCH={RATIONAL R_0=2.6 NN=6 MM=12}
+# This applies the function to the three input matrices element-wise and thus outputs a 7x7 matrix
+r: CUSTOM ARG=c1.x,c1.y,c1.z FUNC=sqrt(x*x+y*y+z*z) PERIODIC=NO
+# Again we are applying the function element wise to the five input matrices and thus outputting a 7x7 matrix
+f: CUSTOM ARG=c1.w,c1.x,c1.y,c1.z,r FUNC=w*(x^4+y^4+z^4)/(r^4) VAR=w,x,y,z,r PERIODIC=NO
+# We now multiply the 7x7 by a vector of ones to calculate the symmetry function
+ones: ONES SIZE=7
+s: MATRIX_VECTOR_PRODUCT ARG=f,ones
+# And print the sum of the symmetry function to a file
+sums: SUM ARG=s PERIODIC=NO
+PRINT ARG=sums FILE=colvar
 ```
 
 This is possible because the chain of actions the $(i,j)$ matrix elements for `r` and `f` (and their derivatives with respect to the atomic positions) are calculated immediately after $(i,j)$ matrix elements

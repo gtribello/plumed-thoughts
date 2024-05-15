@@ -86,75 +86,25 @@ PRINT ARG=s FILE=colvar
 
 If you look at the graph for this input you can see that the numerator and denominator of the quotient above are calculating using a single loop over $i$
 
-```mermaid
-flowchart TB 
-MD(positions from MD)
-Box("label=Box 
- PBC 
-")
-f(["label=f 
- FIXEDATOM 
-"])
-Box -- Box --> cmat
-linkStyle 0 stroke:red,color:red;
-MD --> cmat
-linkStyle 1 stroke:violet,color:violet;
-ones(["label=ones 
- CONSTANT 
-"])
-cmat -- cmat.w --> c1
-linkStyle 2 stroke:red,color:red;
-ones -- ones --> c1
-linkStyle 3 stroke:blue,color:blue;
-Box -- Box --> sp
-linkStyle 4 stroke:red,color:red;
-MD --> sp
-linkStyle 5 stroke:violet,color:violet;
-f -- f --> sp
-linkStyle 6 stroke:violet,color:violet;
-subgraph subsp [sp]
-sp(["label=sp 
- INSPHERE_CALC 
-"])
-subgraph subcmat_mat [cmat]
-cmat(["label=cmat 
- CONTACT_MATRIX 
-"])
-c1(["label=c1 
- MATRIX_VECTOR_PRODUCT 
-"])
-end
-style subcmat_mat fill:lightblue
-numf(["label=numf 
- CUSTOM
-FUNC=x*y 
-"])
-numer(["label=numer 
- SUM 
-"])
-denom(["label=denom 
- SUM 
-"])
-end
-sp -- sp --> numf
-linkStyle 7 stroke:blue,color:blue;
-c1 -- c1 --> numf
-linkStyle 8 stroke:blue,color:blue;
-numf -- numf --> numer
-linkStyle 9 stroke:blue,color:blue;
-sp -- sp --> denom
-linkStyle 10 stroke:blue,color:blue;
-numer -- numer --> s
-denom -- denom --> s
-s(["label=s 
- CUSTOM
-FUNC=x/y 
-"])
-s -- s --> 15
-15("label=#64;15 
- PRINT
-FILE=colvar 
-")
+```plumed
+#SETTINGS MERMAID=value
+f: FIXEDATOM AT=0,0,0
+# Calculate the coordination numbers in the usual way
+cmat: CONTACT_MATRIX GROUP=1-100 SWITCH={RATIONAL R_0=0.1}
+ones: ONES SIZE=100
+c1: MATRIX_VECTOR_PRODUCT ARG=cmat,ones
+# Now calculate whether each atom is within the region of interest.  These is the vector of 100 v_i values in the expression above.
+sp: INSPHERE ATOMS=1-100 CENTER=f RADIUS={RATIONAL R_0=1.0}
+# Now calculate another vector of v_i c_i values.  This action returns a vector with 100 elements.
+numf: CUSTOM ARG=sp,c1 FUNC=x*y PERIODIC=NO
+# Calculate the sum in the numeration of the expression above.
+numer: SUM ARG=numf PERIODIC=NO
+# Calculate the sum in the denominator of the expression above
+denom: SUM ARG=sp PERIODIC=NO
+# And calculate the final quotient of interest
+s: CUSTOM ARG=numer,denom FUNC=x/y PERIODIC=NO
+# Print the final scalar value of the CV to a file
+PRINT ARG=s FILE=colvar
 ```
 
 There is no passing of vectors between actions here.  The $i$th element of the vectors `sp` and `numf` are calculated immediately after the $i$th element of `c1` has been computed.

@@ -37,30 +37,12 @@ r: RESTRAINT ARG=d1s KAPPA=1 AT=3
 
 If you look at the flowchart representation for this input, you can understand how it works more clearly:
 
-```mermaid
-flowchart TB
-MD("positions from MD")
-Box("label=Box 
- PBC")
-Box -- Box --> d1
-linkStyle 0 stroke:red,color:red;
-MD --> d1
-linkStyle 1 stroke:violet,color:violet;
-subgraph subd1 [d1]
-d1(["label=d1
- DISTANCE"])
-d1l(["label=d1l
- LESS_THAN"])
-d1s(["label=d1s
- SUM"])
-end
-d1 -- d1 --> d1l
-linkStyle 2 stroke:blue,color:blue;
-d1l -- d1l --> d1s
-linkStyle 3 stroke:blue,color:blue;
-d1s -- d1s --> r
-r(["label=r
- RESTRAINT"])
+```plumed
+#SETTINGS MERMAID=value
+d1: DISTANCE ATOMS1=1,2 ATOMS2=3,4 ATOMS3=5,6 ATOMS4=7,8 ATOMS5=9,10
+d1l: LESS_THAN ARG=d1 SWITCH={RATIONAL R_0=0.1}
+d1s: SUM ARG=d1l PERIODIC=NO
+r: RESTRAINT ARG=d1s KAPPA=1 AT=3
 ```
 
 The first action above calculates the five distances and passes a vector with five elements to the LESS_THAN action that follows it. This LESS_THAN action
@@ -78,31 +60,12 @@ the distances and derivatives during the apply loop.
 
 As you can see from the flowchart representation for the force passing in the input below, I use the same trick in this new version of PLUMED:
 
-```mermaid
-flowchart BT
-r(["label=r 
- RESTRAINT"])
-r -- d1s --> d1s
-subgraph subd1 [d1]
-d1(["label=d1
- DISTANCE"])
-d1l(["label=d1l
- LESS_THAN"])
-d1 -. d1 .-> d1l
-linkStyle 1 stroke:blue,color:blue;
-d1s(["label=d1s
- SUM"])
-d1l -. d1l .-> d1s
-linkStyle 2 stroke:blue,color:blue;
-end
-d1s == d1s ==> d1
-Box("label=Box
- PBC")
-d1 -- Box --> Box
-linkStyle 4 stroke:red,color:red;
-d1 --> MD
-linkStyle 5 stroke:violet,color:violet;
-MD("positions from MD")
+```plumed
+#SETTINGS MERMAID=force 
+d1: DISTANCE ATOMS1=1,2 ATOMS2=3,4 ATOMS3=5,6 ATOMS4=7,8 ATOMS5=9,10
+d1l: LESS_THAN ARG=d1 SWITCH={RATIONAL R_0=0.1}
+d1s: SUM ARG=d1l PERIODIC=NO
+r: RESTRAINT ARG=d1s KAPPA=1 AT=3
 ```
 
 You can see that forces on the atoms due to the restraint on the sum, d1s, are passed directly to d1. This direct calculation of the forces is possible because derivatives 
