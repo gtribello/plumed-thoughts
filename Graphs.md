@@ -26,46 +26,14 @@ plumed show_graph --plumed plumed.dat --out graph.md
 
 I can generate the graph shown below:
 
-```mermaid
-flowchart TB
-MD("positions from MD")
-Box("label=Box 
- PBC")
-Box -- Box --> c1
-linkStyle 0 stroke:red,color:red;
-MD --> c1
-linkStyle 1 stroke:violet,color:violet;
-c1(["label=c1
- COM"])
-Box -- Box --> c2
-linkStyle 2 stroke:red,color:red;
-MD --> c2
-linkStyle 3 stroke:violet,color:violet;
-c2(["label=c2
- COM"])
-Box -- Box --> d1
-linkStyle 4 stroke:red,color:red;
-c1 -- c1 --> d1
-linkStyle 5 stroke:violet,color:violet;
-c2 -- c2 --> d1
-linkStyle 6 stroke:violet,color:violet;
-d1(["label=d1
- DISTANCE"])
-d1 -- d1.z --> r
-r(["label=r
- RESTRAINT"])
-d1 -- d1.x --> f1
-d1 -- d1.y --> f1
-f1(["label=f1
- CUSTOM
-FUNC=x*x+y*y"])
-d1 -- d1.x --> 7
-d1 -- d1.y --> 7
-f1 -- f1 --> 7
-r -- r.bias --> 7
-7("label=#64;7
- PRINT
-FILE=colvar")
+```plumed
+#SETTINGS MERMAID=value
+c1: COM ATOMS=1-10
+c2: COM ATOMS=11-20
+d1: DISTANCE ATOMS=c1,c2 COMPONENTS
+r: RESTRAINT ARG=d1.z AT=1 KAPPA=1
+f1: CUSTOM ARG=d1.x,d1.y FUNC=x*x+y*y PERIODIC=NO
+PRINT ARG=d1.x,d1.y,f1,r.bias FILE=colvar
 ```
 
 The file `graph.md` output by the command above is renderable using [mermaid](https://mermaid.js.org/syntax/flowchart.html). You can see the resulting flow chart if you copy and paste the file's contents 
@@ -97,34 +65,14 @@ plumed show_graph --plumed plumed.dat --out graph.md --force
 
 When I run the command above on the plumed input above, I obtain the following flowchart:
 
-```mermaid
-flowchart BT
-r(["label=r 
- RESTRAINT"])
-r -- d1.z --> d1
-d1(["label=d1
- DISTANCE"])
-c2(["label=c2
- COM"])
-c1(["label=c1
- COM"])
-Box("label=Box
- PBC")
-c1 -- Box --> Box
-linkStyle 1 stroke:red,color:red;
-c1 --> MD
-linkStyle 2 stroke:violet,color:violet;
-c2 -- Box --> Box
-linkStyle 3 stroke:red,color:red;
-c2 --> MD
-linkStyle 4 stroke:violet,color:violet;
-d1 -- Box --> Box
-linkStyle 5 stroke:red,color:red;
-d1 -- c1 --> c1
-linkStyle 6 stroke:violet,color:violet;
-d1 -- c2 --> c2
-linkStyle 7 stroke:violet,color:violet;
-MD("positions from MD")
+```plumed
+#SETTINGS MERMAID=force 
+c1: COM ATOMS=1-10
+c2: COM ATOMS=11-20
+d1: DISTANCE ATOMS=c1,c2 COMPONENTS
+r: RESTRAINT ARG=d1.z AT=1 KAPPA=1
+f1: CUSTOM ARG=d1.x,d1.y FUNC=x*x+y*y PERIODIC=NO
+PRINT ARG=d1.x,d1.y,f1,r.bias FILE=colvar
 ```
 
 Notice that fewer actions are shown in this new graph. This is because the graph above only shows actions that play some role in the force calculation.
