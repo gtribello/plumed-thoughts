@@ -46,7 +46,7 @@ BIASVALUE ARG=s
 for example, the diagram showing how data passes through the PLUMED actions as the values and derivatives are calculated is as follows:
 
 ```plumed
-#SETTINGS MERMAID=value
+#MERMAID=value
 # Calculate the contact matrix for the first seven atoms in the system
 c1: CONTACT_MATRIX GROUP=1-7 SWITCH={RATIONAL R_0=2.6 NN=6 MM=12}
 # Calculate the coordination numbers for the first seven atoms in the system
@@ -66,7 +66,7 @@ the second row of the matrix with label c1 once the first element of the vector 
 atoms input to c1 are accumulated during the forward loop.  Consequently, when the forces from the biasvalue are applied on s they are passed through the actions as shown below:
 
 ```plumed
-#SETTINGS MERMAID=force
+#MERMAID=force
 # Calculate the contact matrix for the first seven atoms in the system
 c1: CONTACT_MATRIX GROUP=1-7 SWITCH={RATIONAL R_0=2.6 NN=6 MM=12}
 # Calculate the coordination numbers for the first seven atoms in the system
@@ -146,7 +146,7 @@ rr: RESTRAINT ARG=ff AT=62 KAPPA=10
 When the forward loop through the actions in the above input file is performed data is passed as follows:
 
 ```plumed
-#SETTINGS MERMAID=value
+#MERMAID=value
 # Lead ions
 Pb: GROUP ATOMS=1-64
 # Iodide atoms
@@ -192,7 +192,7 @@ You can clearly see from this diagram that all the actions that are needed to ca
 atomic positions in the forward loop so the forces from the restraint can be passed backwards through the actions as follows:
 
 ```plumed
-#SETTINGS MERMAID=force
+#MERMAID=force
 # Lead ions
 Pb: GROUP ATOMS=1-64
 # Iodide atoms

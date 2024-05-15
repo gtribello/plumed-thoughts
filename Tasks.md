@@ -14,7 +14,7 @@ In this article we are going to discuss how PLUMED does this calculation in a li
 at the graph that shows how data passes through the code in this calculation:
 
 ```plumed
-#SETTINGS MERMAID=value
+#MERMAID=value
 d1: DISTANCE ATOMS1=1,2 ATOMS2=3,4 ATOMS3=5,6
 d1l: LESS_THAN ARG=d1 SWITCH={RATIONAL R_0=0.1}
 d1s: SUM ARG=d1l PERIODIC=NO
@@ -124,7 +124,7 @@ where $r_{ij}$ is the distance between atoms $i$ and $j$ and $\sigma_l$ is the s
 You can see the graph that shows how data passes through the code below:
 
 ```plumed
-#SETTINGS MERMAID=value
+#MERMAID=value
 ones: ONES SIZE=100
 c1: CONTACT_MATRIX GROUPA=1-10 GROUPB=11-110 SWITCH={RATIONAL R_0=0.3 D_MAX=0.5}
 cc1: MATRIX_VECTOR_PRODUCT ARG=c1,ones

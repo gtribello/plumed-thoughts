@@ -38,7 +38,7 @@ r: RESTRAINT ARG=d1s KAPPA=1 AT=3
 If you look at the flowchart representation for this input, you can understand how it works more clearly:
 
 ```plumed
-#SETTINGS MERMAID=value
+#MERMAID=value
 d1: DISTANCE ATOMS1=1,2 ATOMS2=3,4 ATOMS3=5,6 ATOMS4=7,8 ATOMS5=9,10
 d1l: LESS_THAN ARG=d1 SWITCH={RATIONAL R_0=0.1}
 d1s: SUM ARG=d1l PERIODIC=NO
@@ -61,7 +61,7 @@ the distances and derivatives during the apply loop.
 As you can see from the flowchart representation for the force passing in the input below, I use the same trick in this new version of PLUMED:
 
 ```plumed
-#SETTINGS MERMAID=force 
+#MERMAID=force 
 d1: DISTANCE ATOMS1=1,2 ATOMS2=3,4 ATOMS3=5,6 ATOMS4=7,8 ATOMS5=9,10
 d1l: LESS_THAN ARG=d1 SWITCH={RATIONAL R_0=0.1}
 d1s: SUM ARG=d1l PERIODIC=NO

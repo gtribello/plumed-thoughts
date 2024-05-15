@@ -27,7 +27,7 @@ plumed show_graph --plumed plumed.dat --out graph.md
 I can generate the graph shown below:
 
 ```plumed
-#SETTINGS MERMAID=value
+#MERMAID=value
 c1: COM ATOMS=1-10
 c2: COM ATOMS=11-20
 d1: DISTANCE ATOMS=c1,c2 COMPONENTS
@@ -66,7 +66,7 @@ plumed show_graph --plumed plumed.dat --out graph.md --force
 When I run the command above on the plumed input above, I obtain the following flowchart:
 
 ```plumed
-#SETTINGS MERMAID=force 
+#MERMAID=force 
 c1: COM ATOMS=1-10
 c2: COM ATOMS=11-20
 d1: DISTANCE ATOMS=c1,c2 COMPONENTS

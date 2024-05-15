@@ -87,7 +87,7 @@ PRINT ARG=s FILE=colvar
 If you look at the graph for this input you can see that the numerator and denominator of the quotient above are calculating using a single loop over $i$
 
 ```plumed
-#SETTINGS MERMAID=value
+#MERMAID=value
 f: FIXEDATOM AT=0,0,0
 # Calculate the coordination numbers in the usual way
 cmat: CONTACT_MATRIX GROUP=1-100 SWITCH={RATIONAL R_0=0.1}

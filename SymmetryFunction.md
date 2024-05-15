@@ -77,7 +77,7 @@ PRINT ARG=sums FILE=colvar
 The graph for this input is shown below:
 
 ```plumed
-#SETTINGS MERMAID=value
+#MERMAID=value
 # Calculate the contact matrix and the three matrices that contain the components of the vectors connecting atom i and atom j.  In other words, calculate four 7x7 matrices
 c1: CONTACT_MATRIX COMPONENTS GROUP=1-7 SWITCH={RATIONAL R_0=2.6 NN=6 MM=12}
 # This applies the function to the three input matrices element-wise and thus outputs a 7x7 matrix
@@ -97,7 +97,7 @@ by `c1` immediately after they are calculated.  Furthermore, if one were to sum 
 shown below:
 
 ```plumed
-#SETTINGS MERMAID=force
+#MERMAID=force
 # Calculate the contact matrix and the three matrices that contain the components of the vectors connecting atom i and atom j.  In other words, calculate four 7x7 matrices
 c1: CONTACT_MATRIX COMPONENTS GROUP=1-7 SWITCH={RATIONAL R_0=2.6 NN=6 MM=12}
 # This applies the function to the three input matrices element-wise and thus outputs a 7x7 matrix
