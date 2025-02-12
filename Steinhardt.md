@@ -558,6 +558,62 @@ lq1: LOCAL_Q1 SPECIES=q1 SWITCH={RATIONAL D_0=2.0 R_0=1.0}
 PRINT ARG=lq1 FILE=colvar
 ```
 
+Please note that if you use the following input:
+
+```plumed
+# Calculate the steinhardt parameters
+q1: Q1 SPECIES=1-100 SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+# Calculate the local steinhard parameters
+lq1: LOCAL_Q1 SPECIES=q1 SWITCH={RATIONAL D_0=2.0 R_0=1.0} MEAN
+# Print the local steinhardt parameters
+PRINT ARG=lq1.mean FILE=colvar
+```
+
+the quantity in the vector that is averaged is:
+
+$$
+s_i = \frac{ \sum_j F_{ij} }{ \sum_j \sigma(r_{ij}) }
+$$
+
+This is not the same vector that is output in the last but one example input above.  If you would like to output a vector that contains all the values for the quantity above you can calculate it using the following long input:
+
+```plumed
+cmat: CONTACT_MATRIX GROUP=1-100 COMPONENTS SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+ones: ONES SIZE=100 
+coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
+sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
+sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones
+q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO
+stack: VSTACK ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+lones: ONES SIZE=6
+unorm: OUTER_PRODUCT ARG=q1,lones 
+oq1: CUSTOM ARG=stack,unorm FUNC=x/y PERIODIC=NO
+oq1T: TRANSPOSE ARG=oq1
+cmat2: CONTACT_MATRIX GROUP=1-100 SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+s: MATRIX_PRODUCT ARG=oq1,oq1T
+f: CUSTOM ARG=cmat2,s FUNC=x*y PERIODIC=NO  
+# This outputs a vector with 100 elements 
+lq1: MATRIX_VECTOR_PRODUCT ARG=f,ones 
+# This calculates the coordination number again, which is used as the demominator in the expression above
+denom: MATRIX_VECTOR_PRODUCT ARG=cmat2,ones
+# And now we normalise by dividing by the coordination number
+lq1_av: CUSTOM ARG=lq1,denom FUNC=x/y PERIODIC=NO
+# This prints the 100 symmetry function values to the file colvar
+PRINT ARG=lq1_av FILE=colvar
+```
+
+Alternatively, if you want to use the shortcut you can use:
+
+```plumed
+# Calculate the steinhardt parameters
+q1: Q1 SPECIES=1-100 SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+# Calculate the local steinhard parameters
+lq1: LOCAL_Q1 SPECIES=q1 SWITCH={RATIONAL D_0=2.0 R_0=1.0}
+# Print the local steinhardt parameters
+PRINT ARG=lq1_av FILE=colvar
+```
+
 ## Conclusion
 
 The implementation of the Steinhardt parameters in previous versions of PLUMED grew rather organically, which made the code confusing and difficult to use.  I hope this article 
