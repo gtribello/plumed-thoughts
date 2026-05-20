@@ -77,4 +77,4 @@ PRINT ARG=d1.x,d1.y,f1,r.bias FILE=colvar
 
 Notice that fewer actions are shown in this new graph. This is because the graph above only shows actions that play some role in the force calculation.
 
-I have found these diagrammatic representations of PLUMED input files enormously beneficial when dealing with complicated PLUMED input files. I will thus use them extensively in these notes about the work that I have done in refining PLUMED.
+I have found these diagrammatic representations of PLUMED input files enormously beneficial when dealing with complicated PLUMED input files. I will thus use them extensively in these notes about the work that I have done in refining PLUMED. 
