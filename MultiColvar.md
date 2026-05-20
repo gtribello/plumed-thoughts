@@ -180,7 +180,7 @@ void LessThan::calc( const ActionWithArguments* action, const std::vector<double
 
 As you can see, the key methods here are `read`, which reads the parameters of the function from the input line, and `calc`, which calculates the value of the 
 function and the derivative at the point specified in `args`.
-
+ 
 As with Colvars, the code above is just a reordering of what you would have done in the old version of PLUMED. Furthermore, you don't need to implement 
 functions using the new method outlined above. You can still inherit from `Function` and implement a scalar-valued function 
 that takes scalar arguments only in the way that you always did
