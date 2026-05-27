@@ -26,8 +26,8 @@ is used in the multiplication in whatever way you choose.  In other words, the n
 
 ## Contact map chains
 
-As discussed on [this page](MultiColvar.md), PLUMED avoids storing the derivatives for each element of a vector by creating a chain of actions instead of passing the vectors.  
-We also use these chains of actions when passing matrices.  When we compute the CV defined by the input below:
+As discussed on [this page](MultiColvar.md), PLUMED avoids storing the derivatives for each element of a vector by recalculating each element of the vector during the backwards apply loop.  
+We also use this trick when working with matrices that are passed between action.  When we compute the CV defined by the input below:
 
 ```plumed
 # Calculate the contact matrix for the first seven atoms in the system
@@ -43,7 +43,7 @@ s: SUM ARG=mtc PERIODIC=NO
 BIASVALUE ARG=s
 ```
 
-for example, the diagram showing how data passes through the PLUMED actions as the values and derivatives are calculated is as follows:
+for example, the diagram showing how data passes through the PLUMED actions as the values calculated is as follows:
 
 ```plumed
 #MERMAID=value
@@ -60,10 +60,7 @@ s: SUM ARG=mtc PERIODIC=NO
 BIASVALUE ARG=s
 ```
 
-Notice that the CONTACT_MATRIX, MATRIX_VECTOR_PRODUCT, MORE_THAN and SUM actions are all in the same subgraph.  The grouping of these actions indicates that the 
-first row of the contact matrix is calculated at the same time as the first elements of the vectors with labels cc and mtc.  In other words, PLUMED only starts calculating 
-the second row of the matrix with label c1 once the first element of the vector mtc has been added to the scalar s.  Furthermore, the derivatives of s with respect to the 
-atoms input to c1 are accumulated during the forward loop.  Consequently, when the forces from the biasvalue are applied on s they are passed through the actions as shown below:
+When the forces from the biasvalue are applied on s they are passed through the actions as shown below:
 
 ```plumed
 #MERMAID=force
@@ -80,7 +77,7 @@ s: SUM ARG=mtc PERIODIC=NO
 BIASVALUE ARG=s
 ```
 
-In short, we do not need to calculate the matrix elements of c1 twice in order to apply the forces as we accumulate the derivatives of the final scalar s during the forward loop.
+During this backwards pass through the actions the elements of the contact matrix are recalculated so we can accumulate the derivatives.
 
 ## Optimisation details
 
@@ -188,8 +185,8 @@ ff: SUM ARG=mm PERIODIC=NO
 rr: RESTRAINT ARG=ff AT=62 KAPPA=10
 ```
 
-You can clearly see from this diagram that all the actions that are needed to calculate the final biased quantity ff are in the same subgraph.  We thus calculate the derivatives of ff with respect to the input 
-atomic positions in the forward loop so the forces from the restraint can be passed backwards through the actions as follows:
+We then calculate the derivatives of ff with respect to the input atomic positions by passing backwards through the actions as follows and recalculating the 
+elements of the various matrices are vectors that are used in the calculation:
 
 ```plumed
 #MERMAID=force

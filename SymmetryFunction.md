@@ -36,7 +36,8 @@ where $f$ is some function of the $x_{ij}$, $y_{ij}$ and $z_{ij}$ components of 
 COMPONENTS flag on the CONTACT_MATRIX command that can be used as shown below:
 
 ```plumed
-# Calculate the contact matrix and the three matrices that contain the components of the vectors connecting atom i and atom j.  In other words, calculate four 7x7 matrices
+# Calculate the contact matrix and the three matrices that contain the components of the 
+# vectors connecting atom i and atom j.  In other words, calculate four 7x7 matrices
 c1: CONTACT_MATRIX COMPONENTS GROUP=1-7 SWITCH={RATIONAL R_0=2.6 NN=6 MM=12}
 # Output the four 7x7 matrices calculated by the command above to a file.
 PRINT ARG=c1.w,c1.x,c1.y,c1.z FILE=colvar
@@ -60,11 +61,14 @@ of atom $i$.__
 We can use the CONTACT_MATRIX command with the COMPONENTS keyword to calculate a function similar to $s_i$ above as follows:
 
 ```plumed
-# Calculate the contact matrix and the three matrices that contain the components of the vectors connecting atom i and atom j.  In other words, calculate four 7x7 matrices
+# Calculate the contact matrix and the three matrices that contain the components of the 
+# vectors connecting atom i and atom j.  In other words, calculate four 7x7 matrices
 c1: CONTACT_MATRIX COMPONENTS GROUP=1-7 SWITCH={RATIONAL R_0=2.6 NN=6 MM=12}
-# This applies the function to the three input matrices element-wise and thus outputs a 7x7 matrix
+# This applies the function to the three input matrices element-wise and thus outputs 
+# a 7x7 matrix
 r: CUSTOM ARG=c1.x,c1.y,c1.z FUNC=sqrt(x*x+y*y+z*z) PERIODIC=NO
-# Again we are applying the function element wise to the five input matrices and thus outputting a 7x7 matrix
+# Again we are applying the function element wise to the five input matrices and thus 
+# outputting a 7x7 matrix
 f: CUSTOM ARG=c1.w,c1.x,c1.y,c1.z,r FUNC=w*(x^4+y^4+z^4)/(r^4) VAR=w,x,y,z,r PERIODIC=NO
 # We now multiply the 7x7 by a vector of ones to calculate the symmetry function
 ones: ONES SIZE=7
@@ -92,9 +96,7 @@ sums: SUM ARG=s PERIODIC=NO
 PRINT ARG=sums FILE=colvar
 ```
 
-Notice that all the commands are done in a single chain.  There is no need to store any matrix elements as the functions in `r` and `f` are applied to the elements of the matrices calculated
-by `c1` immediately after they are calculated.  Furthermore, if one were to sum the elements of the vector `s` and add a bias upon the sum, the forces on `s` are passed back through the code as
-shown below:
+The way forces are passed through the code is illustrated below.  
 
 ```plumed
 #MERMAID=value
@@ -112,8 +114,7 @@ sums: SUM ARG=s PERIODIC=NO
 PRINT ARG=sums FILE=colvar
 ```
 
-This is possible because the chain of actions the $(i,j)$ matrix elements for `r` and `f` (and their derivatives with respect to the atomic positions) are calculated immediately after $(i,j)$ matrix elements
-for `c1.w`, `c1.x`, `c1.y` and `c1.z`.  In other words, in calculating `sums` we do a single loop over $i$ and $j$ and can thus accumulate values and derivatives without storing any matrices or vectors.
+Once again the elements of any matrices and vectors are recomputed during the backward loop when we apply the chain rule.
 
 ## Extending these symmetry functions
 

@@ -8,11 +8,13 @@ input something like this:
 
 ```plumed
 # This will output a vector with 99 components.  Each component of this vector is calculated
-# by applying a switching function on the distance between atom 1 and one of the atoms in the system
+# by applying a switching function on the distance between atom 1 and one of the atoms in 
+# the system
 sp: INSPHERE ATOMS=2-100 CENTER=1 RADIUS={RATIONAL R_0=1.0}
 # This adds together all the elements of sp
 sumsp: SUM ARG=sp PERIODIC=NO
-# And this prints the final scalar quantity that tells you how many atoms are in the sphere to a file.
+# And this prints the final scalar quantity that tells you how many atoms are in the sphere 
+# to a file.
 PRINT ARG=sumsp FILE=colvar
 ```
 
@@ -53,63 +55,8 @@ As PBCs are applied on the distances calculated in the action `sp` using the FIX
 
 ## Calculating the average value of a CV in a region
 
-You may be wondering why, in the inputs that I have shown thus far, vectors that tell us whether each atom is inside or outside the region of interest are computed and exposed in the input.
-The reason is that these vectors are useful in other cases.  For example, we can calculate the average value of the coordination numbers of the atoms that are within a sphere.  This quantity would 
-be defined as:
-
-$$
-c_v = \frac{ \sum_i v_i c_i }{ \sum_i v_i }
-$$
-
-In this expression the sum runs over all atoms.  $c_i$ is the coordination number of atom $i$ and $v_i$ is a scalar that tells you that atom $i$ is within the region of interest.
-You can implement this CV in PLUMED using the following input:
-
-```plumed
-f: FIXEDATOM AT=0,0,0
-# Calculate the coordination numbers in the usual way
-cmat: CONTACT_MATRIX GROUP=1-100 SWITCH={RATIONAL R_0=0.1}
-ones: ONES SIZE=100
-c1: MATRIX_VECTOR_PRODUCT ARG=cmat,ones
-# Now calculate whether each atom is within the region of interest.  These is the vector of 100 v_i values in the expression above.
-sp: INSPHERE ATOMS=1-100 CENTER=f RADIUS={RATIONAL R_0=1.0}
-# Now calculate another vector of v_i c_i values.  This action returns a vector with 100 elements.
-numf: CUSTOM ARG=sp,c1 FUNC=x*y PERIODIC=NO
-# Calculate the sum in the numeration of the expression above.
-numer: SUM ARG=numf PERIODIC=NO
-# Calculate the sum in the denominator of the expression above
-denom: SUM ARG=sp PERIODIC=NO
-# And calculate the final quotient of interest
-s: CUSTOM ARG=numer,denom FUNC=x/y PERIODIC=NO
-# Print the final scalar value of the CV to a file
-PRINT ARG=s FILE=colvar
-``` 
-
-If you look at the graph for this input you can see that the numerator and denominator of the quotient above are calculating using a single loop over $i$
-
-```plumed
-#MERMAID=value
-f: FIXEDATOM AT=0,0,0
-# Calculate the coordination numbers in the usual way
-cmat: CONTACT_MATRIX GROUP=1-100 SWITCH={RATIONAL R_0=0.1}
-ones: ONES SIZE=100
-c1: MATRIX_VECTOR_PRODUCT ARG=cmat,ones
-# Now calculate whether each atom is within the region of interest.  These is the vector of 100 v_i values in the expression above.
-sp: INSPHERE ATOMS=1-100 CENTER=f RADIUS={RATIONAL R_0=1.0}
-# Now calculate another vector of v_i c_i values.  This action returns a vector with 100 elements.
-numf: CUSTOM ARG=sp,c1 FUNC=x*y PERIODIC=NO
-# Calculate the sum in the numeration of the expression above.
-numer: SUM ARG=numf PERIODIC=NO
-# Calculate the sum in the denominator of the expression above
-denom: SUM ARG=sp PERIODIC=NO
-# And calculate the final quotient of interest
-s: CUSTOM ARG=numer,denom FUNC=x/y PERIODIC=NO
-# Print the final scalar value of the CV to a file
-PRINT ARG=s FILE=colvar
-```
-
-There is no passing of vectors between actions here.  The $i$th element of the vectors `sp` and `numf` are calculated immediately after the $i$th element of `c1` has been computed.
-Furthremore, to make this code is made even more rapid as we use the INSPHERE action to determine which coordination numbers need to be calculated.  In other words, PLUMED only calculates
-the coordination numbers of those atoms thare are within the region of interest.  Those that are not within this region, which we do not need to calculate the CV, are not computed. 
+Methods for using the functionality discussed above to calculate the average value of an order parameter in a particular part of the box are discussed at length in [this tutorial paper](https://pubs.acs.org/doi/10.1021/acs.jpcb.5c07562).
+The paper also discusses how to ensure that such calculations run quickly.
 
 ## Conclusions
 

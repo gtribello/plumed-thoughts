@@ -39,13 +39,19 @@ In calculating these two functions we need to do a sum of a function of all the 
 these variables within PLUMED and need to implement nothing new.  We can simply use the following code to compute $G^2$ and $G^3$ with $\nu=1$, $r_s=3$ and $\kappa=1$:
 
 ```plumed
-# Calculate the contact matrix.  Element i,j of this matrix tells you if atoms i and j are within a certain cutoff of each other
-cmat: CONTACT_MATRIX GROUP=1-100 COMPONENTS SWITCH={CUSTOM R_0=4.5 D_MAX=4.5 FUNC=0.5*(cos(pi*x)+1)}
+# Calculate the contact matrix.  Element i,j of this matrix tells you if atoms i and j 
+# are within a certain cutoff of each other
+cmat: CONTACT_MATRIX ...
+   GROUP=1-100 COMPONENTS 
+   SWITCH={CUSTOM R_0=4.5 D_MAX=4.5 FUNC=0.5*(cos(pi*x)+1)}
+...
 # Now calculate a matrix with all the R_ij values
 cmatr: CUSTOM ARG=cmat.x,cmat.y,cmat.z FUNC=sqrt(x*x+y*y+z*z) PERIODIC=NO
-# Compute the quantity in the summation in the expression for G^2.  The output here is a 100x100 matrix.
+# Compute the quantity in the summation in the expression for G^2.  
+# The output here is a 100x100 matrix.
 g2_f: CUSTOM ARG=cmatr,cmat.w FUNC=y*exp(-(x-3)^2) PERIODIC=NO
-# Compute the quantity in the summation in the expression for G^3.  The output here is a 100x100 matrix.
+# Compute the quantity in the summation in the expression for G^3.  
+# The output here is a 100x100 matrix.
 g3_f: CUSTOM ARG=cmatr,cmat.w FUNC=y*cos(x) PERIODIC=NO
 # Now multply the matrices above by a vector of all ones to do the summations
 ones: ONES SIZE=100
@@ -61,20 +67,30 @@ Notice the flexibility of this implementation for the Behler symmetry function y
 coordination sphere using an input like this one.  A similar input (see below) could be used to calculate the FCC cubic parameter:
 
 ```plumed
-# Calculate the contact matrix.  Element i,j of this matrix tells you if atoms i and j are within a certain cutoff of each other
-cmat: CONTACT_MATRIX GROUP=1-100 COMPONENTS SWITCH={CUSTOM R_0=4.5 D_MAX=4.5 FUNC=0.5*(cos(pi*x)+1)}
+# Calculate the contact matrix.  Element i,j of this matrix tells you if atoms i and j are 
+# within a certain cutoff of each other
+cmat: CONTACT_MATRIX ...
+  GROUP=1-100 COMPONENTS 
+  SWITCH={CUSTOM R_0=4.5 D_MAX=4.5 FUNC=0.5*(cos(pi*x)+1)}
+...
 # Now calculate a matrix with all the R_ij values
 cmatr: CUSTOM ARG=cmat.x,cmat.y,cmat.z FUNC=sqrt(x*x+y*y+z*z) PERIODIC=NO
 # Now calculate the fcc cubic parameter for each bond.  This outputs a matrix
-fcc_f: CUSTOM ARG=cmat.x,cmat.y,cmat.z,cmatr FUNC=((x^4)*(y^4)+(x^4)*(z^4)+(y^4)*(z^4))/(r^8)-27*(x^4)*(y^4)*(z^4)/(r^12) VAR=x,y,z,r PERIODIC=NO
+fcc_f: CUSTOM ...
+   ARG=cmat.x,cmat.y,cmat.z,cmatr 
+   FUNC=((x^4)*(y^4)+(x^4)*(z^4)+(y^4)*(z^4))/(r^8)-27*(x^4)*(y^4)*(z^4)/(r^12) 
+   VAR=x,y,z,r PERIODIC=NO
+...
 # And multiply the above by the weights to get another 100 x 100 matrix
 wfcc_f: CUSTOM ARG=fcc_f,cmat.w FUNC=x*y PERIODIC=NO
-# Now sum the rows of the matrix above to get a vector with 100 elements.  One symmetry function for each atom. 
+# Now sum the rows of the matrix above to get a vector with 100 elements.  
+# One symmetry function for each atom. 
 ones: ONES SIZE=100
 fcc_u: MATRIX_VECTOR_PRODUCT ARG=wfcc_f,ones 
 # This is the coordination number
 denom: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
-# We devide fcc_u by the coordination number to get the average value of the function above for the atoms in the first coordination sphere.
+# We devide fcc_u by the coordination number to get the average value of the function above 
+# for the atoms in the first coordination sphere.
 fcc: CUSTOM ARG=fcc_u,denom FUNC=x/y PERIODIC=NO
 # And finally we print the 100 symmetry function values to a file called colvar.
 PRINT ARG=fcc FILE=colvar
@@ -95,7 +111,7 @@ In this expression $\zeta$, $\nu$ and $\lambda$ are all parameters.  $f_c$ is a 
 $R_{ik}$, the distance between atom $i$ and atom $k$.  $\theta_{ijk}$ is then the angle between the vector that points from atom $i$ to atom $j$ and the vector that points from 
 atom $i$ to atom $k$. 
 
-Even this complicated function can be calculated directly in PLUMED.  The input below caluclates the $G^5_i$ value for atom 1 with $\zeta=3$, $\lambda=3 and $\nu=0.1$.
+Even this complicated function can be calculated directly in PLUMED.  The input below caluclates the $G^5_i$ value for atom 1 with $\zeta=3$, $\lambda=3$ and $\nu=0.1$.
 
 ```plumed
 # Calculate the distances between atom one and all the other atoms
@@ -142,13 +158,16 @@ as follows:
 ```plumed
 # Calculate the contact matrix and the x,y and z components of the bond vectors
 # This action calculates 4 100x100 matrices
-cmat: CONTACT_MATRIX GROUP=1-100 SWITCH={CUSTOM R_0=4.5 D_MAX=4.5 FUNC=0.5*(cos(pi*x)+1)} COMPONENTS
+cmat: CONTACT_MATRIX ...
+  GROUP=1-100 SWITCH={CUSTOM R_0=4.5 D_MAX=4.5 FUNC=0.5*(cos(pi*x)+1)} 
+  COMPONENTS
+...
 
 # Compute the symmetry function for the 100 atoms from the 4 100x100 matrices output
 # by cmat.  The output from this action is a vector with 100 elements
 beh3: GSYMFUNC_THREEBODY ...
-    WEIGHT=cmat.w ARG=cmat.x,cmat.y,cmat.z
-    FUNCTION1={FUNC=0.25*exp(-0.1*(rij+rik))*(1+3*cos(ajik))^3 LABEL=g5}
+  WEIGHT=cmat.w ARG=cmat.x,cmat.y,cmat.z
+  FUNCTION1={FUNC=0.25*exp(-0.1*(rij+rik))*(1+3*cos(ajik))^3 LABEL=g5}
 ...
 
 # Print the 100 symmetry function values to a file
@@ -168,16 +187,19 @@ Furthermore we can calculate more than one function of these four quantities at 
 ```plumed
 # Calculate the contact matrix and the x,y and z components of the bond vectors
 # This action calculates 4 100x100 matrices
-cmat: CONTACT_MATRIX GROUP=1-100 SWITCH={CUSTOM R_0=4.5 D_MAX=4.5 FUNC=0.5*(cos(pi*x)+1)} COMPONENTS
+cmat: CONTACT_MATRIX ...
+  GROUP=1-100 SWITCH={CUSTOM R_0=4.5 D_MAX=4.5 FUNC=0.5*(cos(pi*x)+1)} 
+  COMPONENTS
+...
 
 # Compute the 4 symmetry function below for the 100 atoms from the 4 100x100 matrices output
 # by cmat.  The output from this action is a vector with 100 elements
 beh3: GSYMFUNC_THREEBODY ...
-    WEIGHT=cmat.w ARG=cmat.x,cmat.y,cmat.z
-    FUNCTION1={FUNC=0.25*(cos(pi*sqrt(rjk)/4.5)+1)*exp(-0.1*(rij+rik+rjk))*(1+2*cos(ajik))^2 LABEL=g4}
-    FUNCTION2={FUNC=0.25*exp(-0.1*(rij+rik))*(1+3.5*cos(ajik))^3 LABEL=g5}
-    FUNCTION3={FUNC=0.125*(1+6.6*cos(ajik))^4 LABEL=g6}
-    FUNCTION4={FUNC=sin(3.0*(ajik-1)) LABEL=g7}
+  WEIGHT=cmat.w ARG=cmat.x,cmat.y,cmat.z
+  FUNCTION1={FUNC=0.25*(cos(pi*sqrt(rjk)/4.5)+1)*exp(-0.1*(rij+rik+rjk))*(1+2*cos(ajik))^2 LABEL=g4}
+  FUNCTION2={FUNC=0.25*exp(-0.1*(rij+rik))*(1+3.5*cos(ajik))^3 LABEL=g5}
+  FUNCTION3={FUNC=0.125*(1+6.6*cos(ajik))^4 LABEL=g6}
+  FUNCTION4={FUNC=sin(3.0*(ajik-1)) LABEL=g7}
 ...
 
 # Print the 4 sets of 100 symmetry function values to a file

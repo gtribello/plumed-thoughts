@@ -40,30 +40,9 @@ hA: CUSTOM ARG=hA_u,hA_nsum FUNC=x/y PERIODIC=NO
 DUMPGRID ARG=hA FILE=histo STRIDE=1
 ```
 
-One can, in fact, go even further and rewrite this input like this:
-
-```plumed
-x: DISTANCE ATOMS=1,2
-# This bit sets up values that hold the shape of the kernel we are adding.
-hA_sigma: CONSTANT VALUES=0.1
-hA_cov: CUSTOM ARG=hA_sigma FUNC=x*x PERIODIC=NO
-hA_icov: CUSTOM ARG=hA_cov FUNC=1/x PERIODIC=NO
-# This bit sets up the height of the Gaussian in a way that ensures that the 
-# volume of the kernel is one.
-hA_h: CUSTOM ARG=hA_sigma FUNC=1/(x*sqrt(2*pi)) PERIODIC=NO
-hA_weight: CONSTANT VALUES=1
-hA_kde: KDE ARG=x GRID_MIN=0.0 GRID_MAX=3.0 GRID_BIN=100 HEIGHTS=hA_h METRIC=hA_icov
-hA_kdep: CUSTOM ARG=hA_kde,hA_weight FUNC=x*y PERIODIC=NO
-hA_u: ACCUMULATE ARG=hA_kdep STRIDE=1
-hA_nsum: ACCUMULATE ARG=hA_weight STRIDE=1
-hA: CUSTOM ARG=hA_u,hA_nsum FUNC=x/y PERIODIC=NO
-DUMPGRID ARG=hA FILE=histo STRIDE=1
-```
-
-In other words, the input syntax for these actions is flexibile enough that you can pass the shape of the Gaussians that you want to use when constructing your histogram in the input and the heights of the Gaussians to use.  
-You can even pass a matrix in the input for the METRIC keyword if you want to use non-diagonal covariance matrices when adding kernels.  In short, users have an exquisite control over the way their histograms are constructed
-if they move away from using the short cuts.  Importantly, they can control how the histogram is normalised or not normalised.  In collaborations I have been a part of I have found that folks want to exploit this flexibilty.  
-I also hope that the syntax I will describe in these pages offers this flexibilty while still being quite transparant.  
+If you look at the manual pages for this action you will see how you can even pass the shape of the Gaussians that you want to use when constructing your histogram in the input and the heights of the Gaussians to use.  
+In short, users have an exquisite control over the way their histograms are constructed if they move away from using the short cuts.  Importantly, they can control how the histogram is normalised or not normalised.  
+In collaborations I have been a part of I have found that folks want to exploit this flexibilty.  I also hope that the syntax I will describe in these pages offers this flexibilty while still being quite transparant.  
 
 ## Time and spatial average histograms
 
@@ -173,7 +152,9 @@ These weights can be used to do any reweighting to take account of different con
 
 ## Spatial averages
 
-Over the last few years researchers from Michele's group and I wrote functionality in PLUMED for [this paper]() on the capiliary fluctuation method and [this one]() on determining the shape of a nucleating solid.  These papers made use of an action called MULTICOLVARDENS that built a continuous representation for the average
+Over the last few years researchers from Michele's group and I wrote functionality in PLUMED for [this paper](https://pubs.aip.org/aip/jcp/article-abstract/152/4/044103/76401/Classical-nucleation-theory-predicts-the-shape-of?redirectedFrom=fulltext) 
+on the capiliary fluctuation method 
+and [this one](https://iopscience.iop.org/article/10.1088/1361-648X/aa893d/meta) on determining the shape of a nucleating solid.  These papers made use of an action called MULTICOLVARDENS that built a continuous representation for the average
 value of some atom-based order parameter at each point in the simulation cell.  With the new version of PLUMED there is no need to implement a second MULTICOLVARDENS action as you can calculate these fields by using the KDE command directly as shown below:
 
 ```plumed
@@ -188,45 +169,4 @@ DUMPGRID ARG=p FILE=dens STRIDE=1
 
 I hope what is beign calculated here is clear from the syntax above.  Notice, furthermore, that if one wants to compute the average over multiple frames you can accumulate the grids with labels p_numer and p_denom.  On steps where the average of the function is desired you can then compute the ratio of the two grids with CUSTOM.
 
-Notice lastly that this input can also be used to calculate the conditional average of a CV as a function of another CV.  In other words, you can use inputs like the one above to calculate the average value of $s$ when some other CV has a fixed value as is discussed in [this paper]().
-
-## Weights, volumes and normalisation
-
-I hope the examples in the previous sections have demonstrated the flexibility of this new implementation of the histogram in PLUMED.  When designing the syntax for this implementation I have tried to ensure that users can control all aspects of making the histogram. In other words, 
-I am trying not to force them to make decisions about the way in which the histogram is constructed.  Furthermore, when I have made decisions I have tried to make the log provide information on the decisions that have been made and there is a way for the user to control those decisions.  My reason for 
-desining the code in this way is that I have learned from experience that users will often want histograms that are normalised in different ways.  I thus wanted to avoid writing code that forced the histogram to have a particular normalisation.  Really I want the user to decide how (or if) to normalise
-their histogram.
-
-One issue that I think has caused some confusion, and that is worth explaining, is whether the Gaussians that are added when you do KDE have a height of 1 or a volume of one.  The default in PLUMED if you use an input like this one:
-
-```plumed
-x: DISTANCE ATOMS=1,2
-hA_kde: KDE ARG=x GRID_MIN=0.0 GRID_MAX=3.0 GRID_BIN=100 BANDWIDTH=0.1
-```
-
-Is that the volume of the added Gaussian is one.  If you want the height of the Gaussian to be one you would write:
-
-```plumed
-one: CONSTANT VALUE=1
-x: DISTANCE ATOMS=1,2
-hA_kde: KDE ARG=x GRID_MIN=0.0 GRID_MAX=3.0 GRID_BIN=100 BANDWIDTH=0.1 HEIGHTS=one
-```
-
-You can also set the volumes of the added kernels to a value other than one by doing:
-
-```plumed
-f: CONSTANT VALUE=4
-x: DISTANCE ATOMS=1,2
-hA_kde: KDE ARG=x GRID_MIN=0.0 GRID_MAX=3.0 GRID_BIN=100 BANDWIDTH=0.1 VOLUMES=f
-```
-
-This input is, however, just a shortcut that is equivalent to the following longer input:
-
-```plumed
-f: CONSTANT VALUE=4
-fh: CUSTOM ARG=f FUNC=x/(sqrt(2*pi)*0.1) PERIODIC=NO
-x: DISTANCE ATOMS=1,2
-hA_kde: KDE ARG=x GRID_MIN=0.0 GRID_MAX=3.0 GRID_BIN=100 BANDWIDTH=0.1 HEIGHTS=fh
-```
-
-In conclusion, and if in doubt, you can always control the height of the maximum in the added Gaussian by using the HEIGHTS keyword. 
+Notice lastly that this input can also be used to calculate the conditional average of a CV as a function of another CV.  In other words, you can use inputs like the one above to calculate the average value of $s$ when some other CV has a fixed value as is discussed in [this paper](https://pubs.aip.org/aip/jcp/article-abstract/149/10/104104/196263/Building-maps-in-collective-variable-space?redirectedFrom=fulltext).

@@ -10,7 +10,7 @@ lq: COORDINATIONNUMBER SPECIES=1-100 SWITCH={CUBIC D_0=0.45 D_MAX=0.55}
 # Calculate the contact matrix for the atoms for which we calculated the coordinaion numbers
 cm: CONTACT_MATRIX GROUP=lq SWITCH={CUBIC D_0=0.45 D_MAX=0.55}
 # Do a clustering using the contact matrix above
-dfs: DFSCLUSTERING MATRIX=cm
+dfs: DFSCLUSTERING ARG=cm
 # Sum the coordination numbers for the atoms in the largest cluster
 clust1: CLUSTER_PROPERTIES CLUSTERS=dfs ARG=lq CLUSTER=1 SUM
 ```

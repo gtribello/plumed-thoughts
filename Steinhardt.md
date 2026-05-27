@@ -36,9 +36,9 @@ ones: ONES SIZE=99
 # Calculate the coordination number for atom 1 by multiplying the contact matrix above 
 # by a vector of ones
 coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
-# Evaluate the Y_l^m values for each vector in the first coordination sphere and multiply these 
-# values by \sigma(r_ij).  This action outputs 6 matrices that correspond to the real and imaginary 
-# components of Y^l_m for m values of -1, 0 and +1.
+# Evaluate the Y_l^m values for each vector in the first coordination sphere and multiply 
+# these values by \sigma(r_ij).  This action outputs 6 matrices that correspond to the 
+# real and imaginary components of Y^l_m for m values of -1, 0 and +1.
 sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
 # Now evaluate the numerator in the expression above.  This will output 6 scalars. 
 sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones
@@ -69,9 +69,9 @@ ones: ONES SIZE=99
 # Calculate the coordination number for atom 1 by multiplying the contact matrix above 
 # by a vector of ones
 coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
-# Evaluate the Y_l^m values for each vector in the first coordination sphere and multiply these 
-# values by \sigma(r_ij).  This action outputs 6 matrices that correspond to the real and imaginary 
-# components of Y^l_m for m values of -1, 0 and +1. 
+# Evaluate the Y_l^m values for each vector in the first coordination sphere and multiply 
+# these values by \sigma(r_ij).  This action outputs 6 matrices that correspond to the 
+# real and imaginary components of Y^l_m for m values of -1, 0 and +1. 
 sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
 # Now evaluate the numerator in the expression above.  This will output 6 scalars.  
 sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones
@@ -83,7 +83,10 @@ q1-imn-0: CUSTOM ARG=sp.im-0,coord FUNC=x/y PERIODIC=NO
 q1-rmn-p1: CUSTOM ARG=sp.rm-p1,coord FUNC=x/y PERIODIC=NO
 q1-imn-p1: CUSTOM ARG=sp.im-p1,coord FUNC=x/y PERIODIC=NO
 # Calculate the sum of the squares of the q_lm(i) values
-q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=q1-rmn-n1,q1-imn-n1,q1-rmn-0,q1-imn-0,q1-rmn-p1,q1-imn-p1
+q1_2: COMBINE ...
+  PERIODIC=NO POWERS=2,2,2,2,2,2 
+  ARG=q1-rmn-n1,q1-imn-n1,q1-rmn-0,q1-imn-0,q1-rmn-p1,q1-imn-p1
+...
 # Take the square root of the sum of the squares
 q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO
 # And output this single scalar that results to a file
@@ -100,14 +103,17 @@ ones: ONES SIZE=99
 # Calculate the coordination number for atom 1 by multiplying the contact matrix above
 # by a vector of ones
 coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
-# Evaluate the Y_l^m values for each vector in the first coordination sphere and multiply these
-# values by \sigma(r_ij).  This action outputs 6 matrices that correspond to the real and imaginary
-# components of Y^l_m for m values of -1, 0 and +1.
+# Evaluate the Y_l^m values for each vector in the first coordination sphere and multiply 
+# these values by \sigma(r_ij).  This action outputs 6 matrices that correspond to the 
+# real and imaginary components of Y^l_m for m values of -1, 0 and +1.
 sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
 # Now evaluate the numerators in the expression above.  This will output 6 scalars.
 sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones
 # Now take the sum of the squares of the numerators
-q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+q1_2: COMBINE ...
+  PERIODIC=NO POWERS=2,2,2,2,2,2 
+  ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+...
 # Square root 
 q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO
 # And divide by the number of neighbours
@@ -163,13 +169,15 @@ ones: ONES SIZE=100
 # Calculate the coordination numbers for the atoms by multiplying the contact matrix above
 # by a vector of ones
 coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
-# Evaluate the Y_l^m values for each vector in the first coordination sphere and multiply these
-# values by \sigma(r_ij).  This action outputs 6 matrices that correspond to the real and imaginary
-# components of Y^l_m for m values of -1, 0 and +1.
+# Evaluate the Y_l^m values for each vector in the first coordination sphere and multiply 
+# these values by \sigma(r_ij).  This action outputs 6 matrices that correspond to the 
+# real and imaginary components of Y^l_m for m values of -1, 0 and +1.
 sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
-# Now evaluate the numerator in the expression above.  This will output 6 vectors each of which has 100 components.
+# Now evaluate the numerator in the expression above.  This will output 6 vectors each of 
+# which has 100 components.
 sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones
-# Now evaluate the q_lm(i) values for each atom by dividing by  the coordination number of the corresponding atom
+# Now evaluate the q_lm(i) values for each atom by dividing by  the coordination number of 
+# the corresponding atom
 q1-rmn-n1: CUSTOM ARG=sp.rm-n1,coord FUNC=x/y PERIODIC=NO
 q1-imn-n1: CUSTOM ARG=sp.im-n1,coord FUNC=x/y PERIODIC=NO
 q1-rmn-0: CUSTOM ARG=sp.rm-0,coord FUNC=x/y PERIODIC=NO
@@ -177,7 +185,10 @@ q1-imn-0: CUSTOM ARG=sp.im-0,coord FUNC=x/y PERIODIC=NO
 q1-rmn-p1: CUSTOM ARG=sp.rm-p1,coord FUNC=x/y PERIODIC=NO
 q1-imn-p1: CUSTOM ARG=sp.im-p1,coord FUNC=x/y PERIODIC=NO
 # Calculate the sum of the squares of the q_lm(i) values
-q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=q1-rmn-n1,q1-imn-n1,q1-rmn-0,q1-imn-0,q1-rmn-p1,q1-imn-p1
+q1_2: COMBINE ...
+  PERIODIC=NO POWERS=2,2,2,2,2,2 
+  ARG=q1-rmn-n1,q1-imn-n1,q1-rmn-0,q1-imn-0,q1-rmn-p1,q1-imn-p1
+... 
 # Take the square root of the sum of the squares.  This outputs a vector with 100 components
 q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO
 # Calculate the average Q1 values.
@@ -209,13 +220,15 @@ ones: ONES SIZE=100
 # Calculate the coordination numbers for the atoms by multiplying the contact matrix above
 # by a vector of ones
 coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
-# Evaluate the Y_l^m values for each vector in the first coordination sphere and multiply these
-# values by \sigma(r_ij).  This action outputs 6 matrices that correspond to the real and imaginary
-# components of Y^l_m for m values of -1, 0 and +1.
+# Evaluate the Y_l^m values for each vector in the first coordination sphere and multiply 
+# these # values by \sigma(r_ij).  This action outputs 6 matrices that correspond to the 
+# real and imaginary components of Y^l_m for m values of -1, 0 and +1.
 sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
-# Now evaluate the numerator in the expression above.  This will output 6 vectors each of which has 100 components.
+# Now evaluate the numerator in the expression above.  This will output 6 vectors each of 
+# which has 100 components.
 sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones
-# Now evaluate the q_lm(i) values for each atom by dividing by  the coordination number of the corresponding atom
+# Now evaluate the q_lm(i) values for each atom by dividing by  the coordination number of 
+# the corresponding atom
 q1-rmn-n1: CUSTOM ARG=sp.rm-n1,coord FUNC=x/y PERIODIC=NO
 q1-imn-n1: CUSTOM ARG=sp.im-n1,coord FUNC=x/y PERIODIC=NO
 q1-rmn-0: CUSTOM ARG=sp.rm-0,coord FUNC=x/y PERIODIC=NO
@@ -230,7 +243,10 @@ q1-ims-0: MEAN ARG=q1-imn-0 PERIODIC=NO
 q1-rms-p1: MEAN ARG=q1-rmn-p1 PERIODIC=NO
 q1-ims-p1: MEAN ARG=q1-imn-p1 PERIODIC=NO
 # Now calculate the sum of the squares
-q1_mean2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=q1-rms-n1,q1-ims-n1,q1-rms-0,q1-ims-0,q1-rms-p1,q1-ims-p1
+q1_mean2: COMBINE ...
+  PERIODIC=NO POWERS=2,2,2,2,2,2 
+  ARG=q1-rms-n1,q1-ims-n1,q1-rms-0,q1-ims-0,q1-rms-p1,q1-ims-p1
+...
 # Take the square root 
 q1_mean: CUSTOM ARG=q1_mean2 FUNC=sqrt(x) PERIODIC=NO
 # Print the final value
@@ -272,23 +288,27 @@ value for the coordination number:
 
 ```plumed
 # Calculate the coordination numbers of the first 100 atoms in the system in the usual way.
-# In other words, compute the contact matrix and multiply this matrix by a vector containing all ones.
+# In other words, compute the contact matrix and multiply this matrix by a vector 
+# containing all ones.
 cmat: CONTACT_MATRIX GROUP=1-100 SWITCH={RATIONAL D_0=2.0 R_0=1.0}
 ones: ONES SIZE=100
 coord: MATRIX_VECTOR_PRODUCT ARG=cmat,ones
 # Now calculate a second contact matrix, which we will use for our local averaging.
 cmat2: CONTACT_MATRIX GROUP=1-100 SWITCH={RATIONAL D_0=2.0 R_0=1.0}
-# Get a new set of coordination numbers from cmat2 by multiplying above matrix by vector of ones.
+# Get a new set of coordination numbers from cmat2 by multiplying above matrix by 
+# vector of ones.
 coord2: MATRIX_VECTOR_PRODUCT ARG=cmat2,ones
-# Multiply the second contact matrix above by the vector containing the first set of coordination numbers
-# this gives us a vector that contains the sum of the coordination numbers for all the atoms in the first 
-# coordination spheres
+# Multiply the second contact matrix above by the vector containing the first set of 
+# coordination numbers # this gives us a vector that contains the sum of the 
+# coordination numbers for all the atoms in the first coordination spheres
 prod: MATRIX_VECTOR_PRODUCT ARG=cmat2,coord
-# And compute the local average of the coordination number by taking the vector (prod) that contains the sum
-# of the coordination numbers in the first coordination sphere.  Add to this quantity the value of the coordination 
-# number of the central atom and divide this sum by 1 + the number of atoms in the first coordination sphere.
+# And compute the local average of the coordination number by taking the vector (prod) that 
+# contains the sum of the coordination numbers in the first coordination sphere.  Add to 
+# this quantity the value of the coordination number of the central atom and divide this 
+# sum by 1 + the number of atoms in the first coordination sphere.
 lav: CUSTOM ARG=prod,coord,coord2 FUNC=(x+y)/(1+z) PERIODIC=NO
-# This will print out the 100 average values for the local averages of the coordination numbers
+# This will print out the 100 average values for the local averages of the 
+# coordination numbers
 PRINT ARG=lav FILE=colvar  
 ```
 
@@ -304,7 +324,8 @@ where $\sigma(r_{ij})$ is a switching function that acts on the distance $r_{ij}
 With that in mind lets now consder the full input for the Leichner and Delago order parameters, which is as follows:
 
 ```plumed
-# This is the usual input that we have for computing the Steinhardt parameters that is explained above.
+# This is the usual input that we have for computing the Steinhardt parameters that is 
+# explained above.
 cmat: CONTACT_MATRIX GROUP=1-100 COMPONENTS SWITCH={RATIONAL D_0=2.0 R_0=1.0}
 ones: ONES SIZE=100
 coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
@@ -318,27 +339,31 @@ q1-rmn-p1: CUSTOM ARG=sp.rm-p1,coord FUNC=x/y PERIODIC=NO
 q1-imn-p1: CUSTOM ARG=sp.im-p1,coord FUNC=x/y PERIODIC=NO
 # Now lets calculate the contact matrix that we will use for the local averaging
 cmat2: CONTACT_MATRIX GROUP=1-100 SWITCH={RATIONAL D_0=2.0 R_0=1.0}
-# Get a new set of coordination numbers from cmat2 by multiplying above matrix by vector of ones.
+# Get a new set of coordination numbers from cmat2 by multiplying above matrix by vector 
+# of ones.
 coord2: MATRIX_VECTOR_PRODUCT ARG=cmat2,ones
 # This action constructs a 100 x 6 matrix that contains the q_lm(i) values for all the atoms
 stack: VSTACK ARG=q1-rmn-n1,q1-imn-n1,q1-rmn-0,q1-imn-0,q1-rmn-p1,q1-imn-p1 
-# We now multiply each 100 element vector of q_lm(i) values by the contact matrix.  The result is
-# 6 100 element vectors that contain.  Element i in these vector contains the sum of the q_lm(j) values
-# for those atoms that are in the first coordination sphere of atom i.
+# We now multiply each 100 element vector of q_lm(i) values by the contact matrix.  
+# The result is # 6 100 element vectors that contain.  Element i in these vector 
+# contains the sum of the q_lm(j) values for those atoms that are in the first 
+# coordination sphere of atom i.
 prod: MATRIX_VECTOR_PRODUCT ARG=cmat2,q1-rmn-n1,q1-imn-n1,q1-rmn-0,q1-imn-0,q1-rmn-p1,q1-imn-p1
-# The 6 vectors output by the command above are combined into a 100 x 6 matrix that contains the sums of 
-# the q_lm(i) values for the neighbours of atom i.
+# The 6 vectors output by the command above are combined into a 100 x 6 matrix that 
+# contains the sums of the q_lm(i) values for the neighbours of atom i.
 vpstack: VSTACK ARG=prod.q1-rmn-n1,prod.q1-imn-n1,prod.q1-rmn-0,prod.q1-imn-0,prod.q1-rmn-p1,prod.q1-imn-p1
-# These two commands create a 100 x 6 element matrix.  Every column of this matrix is identical and contains 
-# the 100 coordination numbers for the atoms.
+# These two commands create a 100 x 6 element matrix.  Every column of this matrix is 
+# identical and contains the 100 coordination numbers for the atoms.
 lones: ONES SIZE=6
 unorm: OUTER_PRODUCT ARG=coord2,lones
-# We now compute our local averages for q_lm(i).  The output here is a 100 x 6 matrix of local average values for q_lm(i)
+# We now compute our local averages for q_lm(i).  The output here is a 100 x 6 matrix of 
+# local average values for q_lm(i)
 av: CUSTOM ARG=vpstack,vpstack,unorm FUNC=(x+y)/(1+z) PERIODIC=NO
 # Do an element-wise square of the matrix above.  This is not doing matrix multiplication.
 av2: CUSTOM ARG=av FUNC=x*x PERIODIC=NO
-# We now multiply our 100x6 matrix by a vector with 6 elements.  The result is a vector with 100 elements - one element
-# for each atom in the system.  This is essentially the square of the norm of the vectors of locally-averaged q_lm(i) values.
+# We now multiply our 100x6 matrix by a vector with 6 elements.  The result is a vector 
+# with 100 elements - one element for each atom in the system.  This is essentially the 
+# square of the norm of the vectors of locally-averaged q_lm(i) values.
 aq1_2: MATRIX_VECTOR_PRODUCT ARG=av2,lones 
 # And these are the norms of the vectors of locally-averaged q_lm(i) values.
 aq1: CUSTOM ARG=aq1_2 FUNC=sqrt(x) PERIODIC=NO
@@ -378,7 +403,8 @@ $$
 We can compute the $\overline{q}_{lm}(i)$ values in PLUMED using the following input:
 
 ```plumed
-# This is the usual input that we have for computing the Steinhardt parameters that is explained above.
+# This is the usual input that we have for computing the Steinhardt parameters 
+# that is explained above.
 cmat: CONTACT_MATRIX GROUP=1-100 COMPONENTS SWITCH={RATIONAL D_0=2.0 R_0=1.0}
 ones: ONES SIZE=100
 coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones 
@@ -390,10 +416,12 @@ q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im
 q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO
 # Create a 100 x 6 matrix to hold all the unofrmalised \overline{q}_lm(i) values.
 stack: VSTACK ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
-# Create a second 100 x 6 matrix.  All the columns of this matrix are identical.  They just contain the 100 \overline{q}_l(i) values.
+# Create a second 100 x 6 matrix.  All the columns of this matrix are identical.  
+# They just contain the 100 \overline{q}_l(i) values.
 lones: ONES SIZE=6
 unorm: OUTER_PRODUCT ARG=q1,lones
-# We can now calculate the \overline{q}_lm(i) values by dividing the unormalised values by the \overline{q}_l(i).
+# We can now calculate the \overline{q}_lm(i) values by dividing the unormalised values 
+# by the \overline{q}_l(i).
 # The output here is a 100 x 6 matrix
 oq1: CUSTOM ARG=stack,unorm FUNC=x/y PERIODIC=NO
 # And finally print out the 100 x 6 matrix of overline{q}_lm(i) values.
@@ -422,7 +450,10 @@ ones: ONES SIZE=100
 coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones  
 sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
 sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones
-q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+q1_2: COMBINE ...
+  PERIODIC=NO POWERS=2,2,2,2,2,2 
+  ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+...
 q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO 
 stack: VSTACK ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
 lones: ONES SIZE=6
@@ -452,7 +483,10 @@ ones: ONES SIZE=100
 coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
 sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
 sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones
-q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+q1_2: COMBINE ...
+   PERIODIC=NO POWERS=2,2,2,2,2,2 
+   ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+...
 q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO 
 stack: VSTACK ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
 lones: ONES SIZE=6
@@ -460,7 +494,8 @@ unorm: OUTER_PRODUCT ARG=q1,lones
 oq1: CUSTOM ARG=stack,unorm FUNC=x/y PERIODIC=NO
 # Now transpose the matrix of \overline{q}_lm(i) values
 oq1T: TRANSPOSE ARG=oq1
-# Calculate a second contact matrix.  This will contain the \sigma(r_ij) values in the second equation above.
+# Calculate a second contact matrix.  This will contain the \sigma(r_ij) values in the 
+# second equation above.
 cmat2: CONTACT_MATRIX GROUP=1-100 SWITCH={RATIONAL D_0=2.0 R_0=1.0}
 # Calculate the matrix product, S, described above
 s: MATRIX_PRODUCT ARG=oq1,oq1T
@@ -479,7 +514,10 @@ ones: ONES SIZE=100
 coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
 sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
 sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones
-q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+q1_2: COMBINE ...
+  PERIODIC=NO POWERS=2,2,2,2,2,2 
+  ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+...
 q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO
 stack: VSTACK ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
 lones: ONES SIZE=6
@@ -504,7 +542,10 @@ ones: ONES SIZE=100
 coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
 sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
 sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones
-q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+q1_2: COMBINE ...
+  PERIODIC=NO POWERS=2,2,2,2,2,2 
+  ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+...
 q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO
 stack: VSTACK ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
 lones: ONES SIZE=6
@@ -531,7 +572,10 @@ ones: ONES SIZE=100
 coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
 sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
 sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones    
-q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+q1_2: COMBINE ...
+  PERIODIC=NO POWERS=2,2,2,2,2,2 
+  ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+...
 q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO
 stack: VSTACK ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
 lones: ONES SIZE=6
@@ -583,7 +627,10 @@ ones: ONES SIZE=100
 coord: MATRIX_VECTOR_PRODUCT ARG=cmat.w,ones
 sh: SPHERICAL_HARMONIC ARG=cmat.x,cmat.y,cmat.z,cmat.w L=1
 sp: MATRIX_VECTOR_PRODUCT ARG=sh.*,ones
-q1_2: COMBINE PERIODIC=NO POWERS=2,2,2,2,2,2 ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+q1_2: COMBINE ...
+  PERIODIC=NO POWERS=2,2,2,2,2,2 
+  ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
+...
 q1: CUSTOM ARG=q1_2 FUNC=sqrt(x) PERIODIC=NO
 stack: VSTACK ARG=sp.rm-n1,sp.im-n1,sp.rm-0,sp.im-0,sp.rm-p1,sp.im-p1
 lones: ONES SIZE=6

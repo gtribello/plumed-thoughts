@@ -22,7 +22,9 @@ PRINT ARG=d1.lessthan FILE=colvar
 ```
 to calculate and print the number of the five distances above that are less than 0.1 nm.
 
-A problem with the code I wrote quickly emerged. Many users and developers wanted access to the full vector of $f(\{X\})_i$ values rather than access to sums of these values. I had to add code into the base class to give them access to this vector of values. This tinkering complicated the MultiColvarBase class, making using or developing features where the MultiColvarBase class was involved difficult. Much of the rewriting I have done has
+A problem with the code I wrote quickly emerged. Many users and developers wanted access to the full vector of $f(\{X\})_i$ values rather than access to sums of these values. 
+I had to add code into the base class to give them access to this vector of values. This tinkering complicated the MultiColvarBase class, making using or developing features 
+where the MultiColvarBase class was involved difficult. Much of the rewriting I have done has
  aimed to simplify the MultiColvarBase class and resolve these issues. This is why I have added functionality
 to pass vectors between actions. Giving users and developers direct access to the vectors reduces the amount of code that needs to be in the 
 MultiColvarBase class. This functionality can be moved to other actions, and complicated CVs can be implemented directly from the input file (or using shortcuts).
@@ -50,15 +52,10 @@ then applies a function elementwise to the five components of the vector. The ou
 is then converted to a scalar by the SUM action, which adds all the elements of the vector together.
 
 The derivatives present a problem when implementing CVs using the method described above. The derivative for a vector of CVs is a matrix. For complicated 
-CVs that depend on the positions of many atoms, this matrix quickly gets too large to be stored. I had resolved this problem in earlier versions of PLUMED by 
-calculating the CV once during the forward (calculate) loop and a second time during the backwards (apply) loop (this was what the infamous LOWMEM keyword was telling PLUMED to do).
-For CVs such as the one above, however, I avoided the problem entirely by calculating the derivative of `d1s` with respect to the atomic positions directly.
-For the input above, for example, I would calculate the distance between atoms 1 and 2, transform it by the switching function and then add the value and derivatives for the
-transformed distance to the PLMD::Value d1s before repeating this same process for the distances between atoms 3 and 4, 5 and 6 and so on. I thus have the derivatives 
-of d1s with respect to the atomic positions that I need to calculate the forces due to the restraint r by the end of the calculate loop. I thus do not need to recompute
-the distances and derivatives during the apply loop.
-
-As you can see from the flowchart representation for the force passing in the input below, I use the same trick in this new version of PLUMED:
+CVs that depend on the positions of many atoms, this matrix quickly gets too large to be stored. I have resolved this problem by 
+calculating the CV once during the forward (calculate) loop and a second time during the backwards (apply) loop.  This turns out to be much faster than what was
+done in the older version of PLUMED where the derivative of the sum with respect to the atoms is accumulated in the forward loop by using the chain rule.  The flowchart 
+representations that describe how forces are applied are thus similar to those that show how the forces are applied on scalar quantities.
 
 ```plumed
 #MERMAID=force 
@@ -67,16 +64,6 @@ d1l: LESS_THAN ARG=d1 SWITCH={RATIONAL R_0=0.1}
 d1s: SUM ARG=d1l PERIODIC=NO
 r: RESTRAINT ARG=d1s KAPPA=1 AT=3
 ```
-
-You can see that forces on the atoms due to the restraint on the sum, d1s, are passed directly to d1. This direct calculation of the forces is possible because derivatives 
-of d1s with respect to the positions are computed during the calculate loop.
-
-This trick of calculating derivatives of d1c with respect to atomic positions is achieved by using a recursive chain of calls to the `runTask` methods of the actions with labels
-d1, d1l and d1s when the calculate method of d1 is called. In other words, the `performTask` method from d1 is first used to calculate the distance between atoms 1 and 2. The 
-`performTask` method of d1l is then used to transform this distance using the switching function before the `performTask` method of d1s is used to add this transformed distance to the 
-sum. This process of recursively calling the `performTask` method from these three actions is then repeated for the distance between atoms 3 and 4 and so on.   These 
-three actions are shown in the subgraph labelled d1 in the diagrams above for precisely this reason. The calculate methods for d1l and d1s do nothing. All the calculations for these 
-actions are completed when the calculate method for d1 is called.
 
 Exposing the vector of CV values calculated by a MultiColvar by putting them in the output  PLMD::Value object has dramatically simplified this base class. I have been able 
 to write the base class of a MultiColvar as a template. If you have written a method that inherits from Colvar, you can thus also write an action to calculate a vector that contains multiple 

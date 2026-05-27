@@ -38,7 +38,9 @@ PRINT ARG=d1.x,d1.y,f1,r.bias FILE=colvar
 
 The file `graph.md` output by the command above is renderable using [mermaid](https://mermaid.js.org/syntax/flowchart.html). You can see the resulting flow chart if you copy and paste the file's contents 
 [here](https://mermaid.live/). I used Mermaid to build the charts, as you can insert Mermaid syntax into GitHub markdown. The rendered diagrams then
-appear when GitHub shows the rendered markdown online.
+appear when GitHub shows the rendered markdown online.  The renderer that deals with the PLUMED input files in the manual pages, the PLUMED nest and the PLUMED tutorials site will create the mermaid syntax 
+for you directly from the PLUMED input.  You simply need to add the comment `#MERMAID=value` if you want a graph that shows how values are passed through the code like the one above or the comment
+`#MERMAID=force` if you want a graph that shows how the chain rule is applied to calculate the forces.
 
 Each node in the diagram above represents one of the actions from the PLUMED input file. The arrows then indicate how PLMD::Value
 objects are passed between the actions.  
@@ -46,7 +48,7 @@ objects are passed between the actions.
 The shape of the node tells you about the type of action:
 
 * Rectangular nodes with only outwards arrows are PUT actions containing data passed from the MD code. These nodes cannot take PLMD::Value objects created in PLUMED as input.
-* Rectangular nodes are actions like PRINT that only take PLMD::Value as arguments. These nodes cannot create PLMD::Value objects and pass them to other actions.
+* Rectangular nodes with only inward arrows are actions like PRINT that only take PLMD::Value as arguments. These nodes cannot create PLMD::Value objects and pass them to other actions.
 * Rounded nodes are actions that can take PLMD::Value objects created within PLUMED as input and pass on such objects as output.
 
 The arrows connecting the actions provide information about the PLMD::Value object being passed.
